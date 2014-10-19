@@ -9,16 +9,44 @@ Design notes:
 10: Non-trivial checksum
 
 
-Is your protocol non-pipelined (such as Stop-and-Wait) or pipelined (such as Selective Repeat)?
+- Is your protocol non-pipelined (such as Stop-and-Wait) or pipelined (such as Selective Repeat)?
 Protocol is pipelined with selective repeat style handling
 
 
-Can your protocol handle lost packets?
+- Can your protocol handle lost packets?
+Yes. (outlined in picture) Packets are individually ACK'd
 
 
-Can your protocol handle corrupted packets?
-Can your protocol handle duplicate packets?
-Can your protocol handle out-of-order packets?
-Can your protocol support bi-directional data transfers?
-Does your protocol use a non-trivial checksum algorithm (i.e., anything more sophisticated than the IP checksum)?
-Does your protocol have any other special features for which you request extra credit? Please include a short summary of these features here (even if you describe them in more detail later in the report).
+- Can your protocol handle corrupted packets?
+Yes. See pictures. 
+- Can your protocol handle duplicate packets?
+- Can your protocol handle out-of-order packets?
+
+
+- Can your protocol support bi-directional data transfers?
+No
+
+- Does your protocol use a non-trivial checksum algorithm (i.e., anything more sophisticated than the IP checksum)?
+Yes. Adler32 (don't include this in the report, but we're using a java library for it)
+
+- Does your protocol have any other special features for which you request extra credit? Please include a short summary of these features here (even if you describe them in more detail later in the report).
+No
+
+___Reliable Transport Protocol___
+The RTP design report will need to specify at least the following: 
+a high-level description of how RTP works and of any special features you have designed
+
+- a detailed description of the RTP header structure and its header fields
+Source port and destination port
+The ACK Number is the same as the sequence number, there are no NACKS
+Flags: DATA or ACK
+Window size is "static" during runtime, but can be changed by the user on startup only. Window size is still transmitted by every packet.
+Checksum is 32 bit int, or one word
+There is a sync bit used for establishing connection and breaking connection. Sync bit is 1 for connection establishment and steady state data sending, 0 for disconnecting
+
+
+- finite state-machine diagrams for the two RTP end-points
+
+- algorithmic descriptions for any non-trivial RTP functions (e.g., how it detects corrupted packets
+
+- a formal description of the protocol’s programming interface (the functions it exports to the application layer)
