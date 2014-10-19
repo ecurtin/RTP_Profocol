@@ -1,0 +1,24 @@
+Design notes:
+
+20: Doc
+10: App
+40: Pipelined
+10: Lost
+10: Corrupt
+15: Reordered
+10: Non-trivial checksum
+
+
+Is your protocol non-pipelined (such as Stop-and-Wait) or pipelined (such as Selective Repeat)?
+Protocol is pipelined with selective repeat style handling
+
+
+Can your protocol handle lost packets?
+
+
+Can your protocol handle corrupted packets?
+Can your protocol handle duplicate packets?
+Can your protocol handle out-of-order packets?
+Can your protocol support bi-directional data transfers?
+Does your protocol use a non-trivial checksum algorithm (i.e., anything more sophisticated than the IP checksum)?
+Does your protocol have any other special features for which you request extra credit? Please include a short summary of these features here (even if you describe them in more detail later in the report).
