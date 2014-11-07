@@ -1,3 +1,13 @@
+Our implementation of RTP is a study in the tradeoffs between ease of understanding and efficiency. We will build a pipelined protocol capable of detecting and handling lost packets, reorded packets, and corrupted packets through use of a checksum.
+
+Connection Establishment
+
+Steady-State Sending
+As evident from the state machine diagrams, error handling is entirely the 
+
+Connection Closing
+
+
 Design notes:
 
 20: Doc
@@ -6,11 +16,11 @@ Design notes:
 10: Lost
 10: Corrupt
 15: Reordered
-10: Non-trivial checksum
+05: Non-trivial checksum
 
 
 - Is your protocol non-pipelined (such as Stop-and-Wait) or pipelined (such as Selective Repeat)?
-Protocol is pipelined with selective repeat style handling
+Protocol is pipelined with selective repeat style error handling
 
 
 - Can your protocol handle lost packets?
