@@ -7,5 +7,7 @@
  *
  */
 public class ErrorCheck {
-
+	public ErrorCheck() {
+		
+	}
 }
