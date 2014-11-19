@@ -1,11 +1,12 @@
 import java.io.File;
+import java.io.IOException;
 
 
 public interface RTPSenderMethods {
 	
 	public boolean requestingFileTransfer();
 	
-	public boolean sendFile(File file);
+	public void sendFile(File file) throws IOException;
 	
-	public boolean disconnect();
+	public void disconnect() throws IOException;
 }
