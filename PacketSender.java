@@ -5,10 +5,12 @@ import java.net.SocketException;
 
 public class PacketSender {
 	private DatagramSocket socket;
+	private int windowSize;
 	private DatagramPacket[] currentPackets;
 	
-	public PacketSender(int localPort) throws SocketException {
-		socket = new DatagramSocket(localPort);
+	public PacketSender(DatagramSocket socket, int windowSize) throws SocketException {
+		this.socket = socket;
+		this.windowSize = windowSize;
 	}
 	
 	public void sendPackets(DatagramPacket[] packets) throws IOException {
