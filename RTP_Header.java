@@ -2,7 +2,7 @@
  * 
  */
 public class RTP_Header {
-	
+
 	private int source_ip;
 	private int dest_ip;
 	private int port_numbers;
@@ -106,8 +106,59 @@ public class RTP_Header {
 		return true;
 	}
 
+	/*---------------------GETTERS---------------------------*/
 
+	public int getSourceIP() {
+		return header[0];
+	}
 
+	public int getDestIP() {
+		return header[1];
+	}
+
+	public int getSourcePort() {
+		int source_p = header[2];
+		source_p = source_p ^ 0xFFFF;
+		source_p = source_p >> 16;
+		return source_p;
+	}
+
+	public int getDestPort() {
+		int dest_p = header[2];
+		dest_p = dest_p ^ 0xFFFF0000;
+		return dest_p;
+	}
+
+	//ack number is same as packet number
+	public int getPacketNumber() {
+		return header[3];
+	}
+
+	public int getWindowSize() {
+		int window = header[4];
+		window = window ^ 0x7;
+		return (window >> 3);
+	}
+
+	public boolean isData() {
+		return isSet(header[4], 1);
+	}
+
+	public boolean isACK() {
+		return (!isSet(header[4], 1));
+	}
+
+	public boolean isSync() {
+		return isSet(header[4], 0);
+	}
+
+	public int getChecksum() {
+		return header[5];
+	}
+
+	public int[] getHeader() {
+		return header;
+	}
 
 
 
