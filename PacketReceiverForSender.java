@@ -17,10 +17,10 @@ public class PacketReceiverForSender implements RTPSenderMethods {
 	private PacketCreator packetCreator;
 	private DatagramSocket socket;
 	
-	public PacketReceiverForSender(int localPort) throws IOException {
+	public PacketReceiverForSender(int sourcePort) throws IOException {
 		// SETUP SERVER
-		DatagramSocket socket = new DatagramSocket(localPort);
-		this.packetCreator = new PacketCreator(socket);
+		DatagramSocket socket = new DatagramSocket(sourcePort);
+		this.packetCreator = new PacketCreator(socket, sourcePort, sourceAddress);
 		// Size of allowed packet data
 		byte[] receiveData = new byte[1024];
 		
@@ -31,12 +31,13 @@ public class PacketReceiverForSender implements RTPSenderMethods {
 			// Get and store client IP address and port number
 			InetAddress IPAddress = receivePacket.getAddress();
 			int port = receivePacket.getPort();
-			packetCreator.setAddress(IPAddress);
-			packetCreator.setPort(port);
+			packetCreator.setDestinationAddress(IPAddress);
+			packetCreator.setDestinationPort(port);
 			
-			// Decrypt datagram packet into something RTP understands
+			// Translate datagram packet into something RTP understands
 			Packet packet = new Packet(receivePacket);
 			
+			// Can either be a data ACK or finalizing Connection
 			if (packet.isACKPacket()) {
 				int ACKNumber = packet.getACKNumber();
 				packetCreator.receiveACK(ACKNumber);
@@ -76,6 +77,7 @@ public class PacketReceiverForSender implements RTPSenderMethods {
 	 */
 	public void setFileTransferRequest(String fileName) {
 		requestedFile = fileName;
+		packetCreator.setFileName(fileName);
 	}
 
 }
