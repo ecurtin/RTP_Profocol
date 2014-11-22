@@ -1,6 +1,7 @@
 import java.io.File;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.Queue;
 
@@ -12,35 +13,38 @@ import java.util.Queue;
 public class PacketCreator {
 	private File file;
 	private PacketSender packetSender;
+	private InetAddress sendingAddress;
+	private int windowSize;
+	private int sendingPort;
+	private boolean isConnected = false;
 	
-	public PacketCreator(DatagramSocket socket, int windowSize) throws SocketException {
-		this.packetSender = new PacketSender(socket, windowSize);
+	public PacketCreator(DatagramSocket socket) throws SocketException {
+		this.packetSender = new PacketSender(socket);
+	}
+	
+	public void sendConnectionPacket() {
+		// TODO: Create ConnectionPacket class
+		Packet connectionPacket = new ConnectionPacket();	
+		connectionPacket.setIPAddress(sendingAddress);
+		connectionPacket.setPort(sendingPort);
+		DatagramPacket sendingPacket = connectionPacket.packInUDP();
+		packetSender.sendPacket(sendingPacket);
+	}
+	
+	public DatagramPacket[] createConnectPacket() {
+		//TODO: Implement packet connection creation
+		return null;
 	}
 	
 	public void sendFile() {
 		// Create packets and put them in a queue to be sent
 		Queue<DatagramPacket> packetsQueue = (Queue<DatagramPacket>) createFilePackets(file);
 		
-		while (!packetsQueue.isEmpty()) {
-			// While we still have packets to send...
-			while(sendMorePackets) {
-				DatagramPacket[] packets = null;
-				int numberOfPacketsToSend;
-				int queueSize = packetsQueue.size();
-				
-				if (queueSize > windowSize) {
-					numberOfPacketsToSend = windowSize;
-				} else {
-					numberOfPacketsToSend = queueSize;
-				}
-				
-				for(int i = 0; i < numberOfPacketsToSend; i++) {
-					packets[i] = packetsQueue.remove();
-				};
-				
-				packetSender.sendPackets(packets);
-			};
-		};
+	}
+	
+	public void setWindowSize(int windowSize) {
+		this.windowSize = windowSize;
+		packetSender.setWindowSize(windowSize);
 	}
 	
 	public Queue<DatagramPacket> createFilePackets(File file) {
@@ -49,10 +53,6 @@ public class PacketCreator {
 		return packetsQueue;
 	}
 	
-	public DatagramPacket[] createConnectPackets(String IPAddress, int windowSize) {
-		//TODO: Implement packet connection creation
-		return null;
-	}
 	
 	public DatagramPacket[] createDisconnectPackets() {
 		//TODO: Implement packet disconnection creation
@@ -62,5 +62,24 @@ public class PacketCreator {
 	public DatagramPacket[] createRequestFilePackets(String filename) {
 		//TODO: Implement request file packet creation
 		return null;
+	}
+
+	public void setAddress(InetAddress ipAddress) {
+		this.sendingAddress = ipAddress;
+		
+	}
+
+	public void receiveACK(int ackNumber) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setFile(File file) {
+		this.file = file;
+	}
+
+	public void setPort(int port) {
+		this.sendingPort = port;
+		
 	}
 }
