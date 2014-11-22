@@ -36,7 +36,9 @@ public class Packet {
 
 	/*------------------------GETTERS & SETTERS------------------------*/
 
-	//return the int header in full
+	/*
+		returns the int[] inside of RTP_Header
+	*/
 	public int[] getHeader() {
 		return header.getHeader();
 	}
@@ -46,23 +48,31 @@ public class Packet {
 		return rtp_data;
 	}
 
-	public boolean isConnectionPacket() {
-		// TODO Auto-generated method stub
+	public boolean isData() {
+		if( header.isData() ){
+			return true;
+		}
 		return false;
 	}
 
-	public boolean isACKPacket() {
-		// TODO Auto-generated method stub
+	public boolean isConnection() {
+		if( header.isSync() && header.isConnection()) {
+			return true;
+		}
 		return false;
 	}
 
-	public int getACKNumber() {
-		// TODO Auto-generated method stub
-		return 0;
+	public boolean isACK() {
+		if( header.isACK() ) {
+			return true;
+		}
+		return false;
 	}
 
-	public String getFileName() {
-		// TODO Auto-generated method stub
-		return null;
+	public boolean isDisconnection() {
+		if( !header.isSync() && header.isConnection()) {
+			return true;
+		}
+		return false;
 	}
 }

@@ -20,6 +20,7 @@ public class PacketReceiverForSender implements RTPSenderMethods {
 	public PacketReceiverForSender(int sourcePort) throws IOException {
 		// SETUP SERVER
 		DatagramSocket socket = new DatagramSocket(sourcePort);
+		InetAddress sourceAddress = InetAddress.getLocalHost();
 		this.packetCreator = new PacketCreator(socket, sourcePort, sourceAddress);
 		// Size of allowed packet data
 		byte[] receiveData = new byte[1024];
@@ -38,12 +39,12 @@ public class PacketReceiverForSender implements RTPSenderMethods {
 			Packet packet = new Packet(receivePacket);
 			
 			// Can either be a data ACK or finalizing Connection
-			if (packet.isACKPacket()) {
+			if (packet.isACK()) {
 				int ACKNumber = packet.getACKNumber();
 				packetCreator.receiveACK(ACKNumber);
 				
 			// Connection Packet (receive file name to transfer)
-			} else if (packet.isConnectionPacket()) {
+			} else if (packet.isConnection()) {
 				String fileName = packet.getFileName();
 				setFileTransferRequest(fileName);
 				packetCreator.sendConnectionPacket();
@@ -57,11 +58,6 @@ public class PacketReceiverForSender implements RTPSenderMethods {
 	@Override
 	public String requestingFileTransfer() {
 		return requestedFile;
-	}
-
-	@Override
-	public void sendFile(File file) throws IOException {
-		packetCreator.setFile(file);
 	}
 	
 	/**

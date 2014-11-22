@@ -69,6 +69,9 @@ public class RTP_Header {
 			else {
 				setDataFlag(true);
 			}
+			if(flags > 1) {
+				setConnectionFlag(true);
+			}
 			setWindowSize(window_size);
 			return sync_flags_window;
 		}
@@ -87,14 +90,33 @@ public class RTP_Header {
 	 * The data flag is bit 1 of sync_flags_window set to 1.
 	 */
 	public void setDataFlag(boolean bool) {
-		sync_flags_window = set(sync_flags_window, 1);
+		if(bool == true) {
+			sync_flags_window = set(sync_flags_window, 1);
+		}
+		else {
+			sync_flags_window = clear(sync_flags_window, 1);
+		}
 	}
 	
 	/*
 	 * The ack flag is bit 1 of sync_flags_window set to 0.
 	 */
 	public void setAckFlag(boolean bool) {
-		sync_flags_window = clear(sync_flags_window, 1);
+		if(bool == true) {
+			sync_flags_window = clear(sync_flags_window, 1);
+		}
+		else {
+			sync_flags_window = set(sync_flags_window, 1);
+		}
+	}
+
+	public void setConnectionFlag(boolean bool) {
+		if(bool == true) {
+			sync_flags_window = set(sync_flags_window, 2);
+		}
+		else {
+			sync_flags_window = clear(sync_flags_window, 1);
+		}
 	}
 	
 	public boolean setWindowSize(int window_size) {
@@ -150,6 +172,10 @@ public class RTP_Header {
 
 	public boolean isSync() {
 		return isSet(header[4], 0);
+	}
+
+	public boolean isConnection() {
+		return isSet(header[4], 2);
 	}
 
 	public int getChecksum() {
