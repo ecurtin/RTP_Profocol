@@ -2,12 +2,13 @@
  * 
  */
 public class RTP_Header {
-	public int source_ip;
-	public int dest_ip;
-	public int port_numbers;
-	public int ack_number;
-	public int sync_flags_window;
-	public int checksum;
+	
+	private int source_ip;
+	private int dest_ip;
+	private int port_numbers;
+	private int ack_number;
+	private int sync_flags_window;
+	private int checksum;
 
 	public int[] header;
 	
@@ -21,13 +22,13 @@ public class RTP_Header {
 	}
 	
 	public RTP_Header( int source_ip, 
-					   int dest_ip, 
-					   int source_port, 
-					   int dest_port, 
-					   int ack_number, 
-					   int sync,
-					   int flags,
-					   int window_size ) {
+		int dest_ip, 
+		int source_port, 
+		int dest_port, 
+		int ack_number, 
+		int sync,
+		int flags,
+		int window_size ) {
 		header = new int[6];
 		header[0] = source_ip;
 		header[1] = dest_ip;
@@ -37,9 +38,9 @@ public class RTP_Header {
 		header[5] = 0; //checksum filled in by another class.
 	}
 
-	private boolean packPortNumbers(int source, int dest){
+	private int packPortNumbers(int source, int dest){
 		if (source > 32768 || dest > 32768) {
-			return false; //will not fit into a 16 bit slot;
+			return -1; //will not fit into a 16 bit slot;
 		}
 		else {
 			dest = dest << 16;
@@ -63,12 +64,12 @@ public class RTP_Header {
 				setSyncOff();
 			}
 			if(flags == 0) {
-				setAckFlag();
+				setAckFlag(true);
 			}
 			else {
-				setDataFlag();
+				setDataFlag(true);
 			}
-			setWindowSize();
+			setWindowSize(window_size);
 			return sync_flags_window;
 		}
 	}
@@ -96,10 +97,19 @@ public class RTP_Header {
 		sync_flags_window = clear(sync_flags_window, 1);
 	}
 	
-	public void setWindowSize(int window_size) {
+	public boolean setWindowSize(int window_size) {
+		if( window_size >  0x1FFFFFFF) {
+			return false; //will not fit
+		}
 		window_size = window_size << 3;
 		sync_flags_window = sync_flags_window | window_size;
+		return true;
 	}
+
+
+
+
+
 
 	/**
 	  * Sets the bit (sets to 1) pointed to by index.
@@ -107,56 +117,56 @@ public class RTP_Header {
 	  *        0 for the least significant bit (right most bit).
 	  *        31 for the most significant bit.
 	  */
-	 private int set(int bits, int index)
-	 {
+	private int set(int bits, int index)
+	{
 	    //Ex: bits = 1000, index = 1, mask = 0010
 		//Existing zeroes fall through OR, mask adds 1
 		int mask = 1;
-	    mask = mask << index;
-	    
-	    bits = bits | (mask);
-	    return bits;
-	 }
+		mask = mask << index;
 
-	 /**
-	  * Clears the bit (sets to 0) pointed to by index.
-	  * @param index index of which bit to set.
-	  *        0 for the least significant bit (right most bit).
-	  *        31 for the most significant bit.
-	  */
-	 private int clear(int bits, int index)
-	 {
-	    //Ex: bits = 1010, index = 1, mask = 0010
-		//All other 1's fall through XOR, excepted masked bit
-		//1010 XOR 0010 = 1000 
+		bits = bits | (mask);
+		return bits;
+	}
+
+	/**
+	* Clears the bit (sets to 0) pointed to by index.
+	* @param index index of which bit to set.
+	*        0 for the least significant bit (right most bit).
+	*        31 for the most significant bit.
+	*/
+	private int clear(int bits, int index)
+	{
+	//Ex: bits = 1010, index = 1, mask = 0010
+	//All other 1's fall through XOR, excepted masked bit
+	//1010 XOR 0010 = 1000 
 		int mask = 1;
-	    mask = mask << index;
-	    
-	    bits = bits ^ (mask);
-	    return bits;
-	 }
+		mask = mask << index;
+
+		bits = bits ^ (mask);
+		return bits;
+	}
 
 	 /**
-  * Returns true if the bit pointed to by index is currently set.
-  * @param index index of which bit to check.  
-  *        0 for the least significant bit (right-most bit).
-  *        31 for the most significant bit.
-  * @return true if the bit is set, false if the bit is clear.
-  *         If the index is out of range (index >= 32), then return false.
-  */
- public boolean isSet(int bits, int index)
- {
-	if( index >= 32)
-    {
-       return false;
-    }
-	int mask = 1;
-    mask = mask << index;
-    bits = bits & mask;
-    
+	  * Returns true if the bit pointed to by index is currently set.
+	  * @param index index of which bit to check.  
+	  *        0 for the least significant bit (right-most bit).
+	  *        31 for the most significant bit.
+	  * @return true if the bit is set, false if the bit is clear.
+	  *         If the index is out of range (index >= 32), then return false.
+	  */
+	public boolean isSet(int bits, int index)
+	{
+		if( index >= 32)
+		{
+			return false;
+		}
+		int mask = 1;
+		mask = mask << index;
+		bits = bits & mask;
+
     //if the bit is turned on, the whole number will NOT equal 0
-    return (bits != 0);
- }
-	
-	
+		return (bits != 0);
+	}
+
+
 }
