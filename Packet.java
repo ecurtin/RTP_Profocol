@@ -3,7 +3,8 @@ import java.net.DatagramPacket;
 public class Packet {
 
 	private int[] rpt_packet;
-	private int[] header = new int[6]; //this'll integrate somehow with RTPHeader, not sure how yet
+	//private int[] header = new int[6]; //this'll integrate somehow with RTPHeader, not sure how yet
+	public RTP_Header header;
 	private int[] rtp_data;
 
 	//RECEIVING END, you don't know what type of packet it is yet
@@ -20,6 +21,9 @@ public class Packet {
 	//Upon receipt
 	public void processDatagram(DatagramPacket datagram){
 		// get datagram data, use ByteBufer to to asInt or whatever
+
+
+
 		// split the new Int buffer into header (frst 6 ints) 
 		// and data(all the rest)
 	}
@@ -34,7 +38,7 @@ public class Packet {
 
 	//return the int header in full
 	public int[] getHeader() {
-		return header;
+		return header.getHeader();
 	}
 
 	//
