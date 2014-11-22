@@ -36,7 +36,9 @@ public class Packet {
 
 	/*------------------------GETTERS & SETTERS------------------------*/
 
-	//return the int header in full
+	/*
+		returns the int[] inside of RTP_Header
+	*/
 	public int[] getHeader() {
 		return header.getHeader();
 	}
@@ -44,5 +46,33 @@ public class Packet {
 	//
 	public int[] getData() {
 		return rtp_data;
+	}
+
+	public boolean isData() {
+		if( header.isData() ){
+			return true;
+		}
+		return false;
+	}
+
+	public boolean isConnection() {
+		if( header.isSync() && header.isConnection()) {
+			return true;
+		}
+		return false;
+	}
+
+	public boolean isACK() {
+		if( header.isACK() ) {
+			return true;
+		}
+		return false;
+	}
+
+	public boolean isDisconnection() {
+		if( !header.isSync() && header.isConnection()) {
+			return true;
+		}
+		return false;
 	}
 }
