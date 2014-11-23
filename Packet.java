@@ -82,8 +82,7 @@ public class Packet {
 	}
 
 	public void setSourceIPAddress(InetAddress sourceAddress) {
-		// TODO Auto-generated method stub
-		// grr wtf why is there no easy way to go from inet to int
+		header.setSourceIP(inetAddressToInt( sourceAddress ));
 		
 	}
 
@@ -92,7 +91,7 @@ public class Packet {
 	}
 
 	public void setDestinationIPAddress(InetAddress destinationAddress) {
-		// TODO Auto-generated method stub
+		header.setDestIP(inetAddressToInt( destinationAddress ));
 		
 	}
 
@@ -104,4 +103,19 @@ public class Packet {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	private int packBytesIntoInt(byte[] bytes) {
+		int ret = 0;
+		for (int i = 0; i < bytes.length; i++) {
+		    ret <<= 8;
+		    ret |= bytes[i] & 0xff;
+		}
+		return ret;
+		
+	}
+	
+	private int inetAddressToInt(InetAddress inet){
+		return packBytesIntoInt( inet.getAddress() );
+	}
+	
 }

@@ -13,12 +13,10 @@ public class RTP_Header {
 	public int[] header;
 	
 	public RTP_Header() {
-		source_ip = 0;
-		dest_ip = 0;
-		port_numbers = 0;
-		ack_number = 0;
-		sync_flags_window = 0;
-		checksum = 0;
+		header = new int[6];
+		for(int i = 0; i < 6; i++){
+			header[i] = 0;
+		}
 	}
 	
 	public RTP_Header( int source_ip, 
@@ -110,6 +108,7 @@ public class RTP_Header {
 		sync_flags_window = clear(sync_flags_window, 0);
 	}
 	
+	
 	/*
 	 * The data flag is bit 1 of sync_flags_window set to 1.
 	 */
@@ -121,6 +120,7 @@ public class RTP_Header {
 			sync_flags_window = clear(sync_flags_window, 1);
 		}
 	}
+	
 	
 	/*
 	 * The ack flag is bit 1 of sync_flags_window set to 0.
@@ -134,6 +134,7 @@ public class RTP_Header {
 		}
 	}
 
+	
 	public void setConnectionFlag(boolean bool) {
 		if(bool == true) {
 			sync_flags_window = set(sync_flags_window, 2);
@@ -142,6 +143,7 @@ public class RTP_Header {
 			sync_flags_window = clear(sync_flags_window, 1);
 		}
 	}
+	
 	
 	public boolean setWindowSize(int window_size) {
 		if( window_size >  0x1FFFFFFF) {
@@ -152,8 +154,17 @@ public class RTP_Header {
 		return true;
 	}
 	
+	
 	public void setSequenceNumber(int seqnum){
 		header[3] = seqnum;
+	}
+	
+	public void setSourceIP(int source){
+		header[0] = source;
+	}
+	
+	public void setDestIP(int dest) {
+		header[1] = dest;
 	}
 
 	/*---------------------GETTERS---------------------------*/
