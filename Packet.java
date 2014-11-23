@@ -7,6 +7,7 @@ public class Packet {
 	//private int[] header = new int[6]; //this'll integrate somehow with RTPHeader, not sure how yet
 	public RTP_Header header;
 	protected byte[] rtp_data;
+	private InetAddress destinationInetAddress;
 
 	//RECEIVING END, you don't know what type of packet it is yet
 	public Packet(DatagramPacket datagram) {
@@ -30,12 +31,20 @@ public class Packet {
 	}
 
 	// This should probably be implemented by each class individually
-	public DatagramPacket makeDatagramPacket() {
+	public void makeRTPPacket() {
+		
+		
+		return;
+	}
+
+	public DatagramPacket packInUDP() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
-
 	/*------------------------GETTERS & SETTERS------------------------*/
+
+
 
 	/*
 		returns the int[] inside of RTP_Header
@@ -91,6 +100,7 @@ public class Packet {
 	}
 
 	public void setDestinationIPAddress(InetAddress destinationAddress) {
+		destinationInetAddress = destinationAddress;
 		header.setDestIP(inetAddressToInt( destinationAddress ));
 		
 	}
@@ -99,11 +109,6 @@ public class Packet {
 		header.setDestinationPort(destinationPort);
 	}
 
-	public DatagramPacket packInUDP() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
 	private int packBytesIntoInt(byte[] bytes) {
 		int ret = 0;
 		for (int i = 0; i < bytes.length; i++) {
