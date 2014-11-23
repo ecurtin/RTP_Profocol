@@ -47,6 +47,30 @@ public class RTP_Header {
 			return (dest | source);
 		}
 	}
+	
+	public boolean setDestinationPort(int dest){
+		if (dest > 32768) {
+			return false; //will not fit into a 16 bit slot;
+		}
+		else {
+			dest = dest << 16;
+			header[2] = (dest | header[2]);
+			return true;
+		}
+	}
+	
+	public boolean setSourcePort(int source){
+		if (source > 32768) {
+			return false; //will not fit into a 16 bit slot;
+		}
+		else {
+			header[2] = ( header[2] | source);
+			return true;
+		}
+	}
+	
+	
+	
 
 	/*
 	 * I'm setting up some basic functionality in this class which I fully expect to get refactored
@@ -126,6 +150,10 @@ public class RTP_Header {
 		window_size = window_size << 3;
 		sync_flags_window = sync_flags_window | window_size;
 		return true;
+	}
+	
+	public void setSequenceNumber(int seqnum){
+		header[3] = seqnum;
 	}
 
 	/*---------------------GETTERS---------------------------*/

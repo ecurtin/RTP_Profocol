@@ -1,11 +1,12 @@
 import java.net.DatagramPacket;
+import java.net.InetAddress;
 
 public class Packet {
 
 	private int[] rpt_packet;
 	//private int[] header = new int[6]; //this'll integrate somehow with RTPHeader, not sure how yet
 	public RTP_Header header;
-	private int[] rtp_data;
+	protected byte[] rtp_data;
 
 	//RECEIVING END, you don't know what type of packet it is yet
 	public Packet(DatagramPacket datagram) {
@@ -44,7 +45,7 @@ public class Packet {
 	}
 
 	//
-	public int[] getData() {
+	public byte[] getData() {
 		return rtp_data;
 	}
 
@@ -74,5 +75,33 @@ public class Packet {
 			return true;
 		}
 		return false;
+	}
+	
+	public void setSeqNumber(int i) {
+		header.setSequenceNumber(i);
+	}
+
+	public void setSourceIPAddress(InetAddress sourceAddress) {
+		// TODO Auto-generated method stub
+		// grr wtf why is there no easy way to go from inet to int
+		
+	}
+
+	public void setSourcePort(int sourcePort) {
+		header.setSourcePort(sourcePort);
+	}
+
+	public void setDestinationIPAddress(InetAddress destinationAddress) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setDestinationPort(int destinationPort) {
+		header.setDestinationPort(destinationPort);
+	}
+
+	public DatagramPacket packInUDP() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

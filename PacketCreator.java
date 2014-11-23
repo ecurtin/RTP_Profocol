@@ -51,7 +51,7 @@ public class PacketCreator {
 	// Creates connection packet
 	private DatagramPacket createConnectPacket() {
 		Packet connectionPacket = new ConnectionPacket();	
-		connectionPacket.setIPAddress(destinationAddress);
+		connectionPacket.setDestinationIPAddress(destinationAddress);
 		connectionPacket.setDestinationPort(destinationPort);
 		DatagramPacket sendingPacket = connectionPacket.packInUDP();
 		return sendingPacket;
