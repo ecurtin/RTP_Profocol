@@ -15,10 +15,13 @@ import java.util.Queue;
  *
  */
 public class PacketCreator {
+	
+	private int maxDataSizePerPacketInBytes = 832;
+	
 	private PacketSender packetSender;
 	
 	private String fileName;
-	private byte[] fileData = new byte[832];
+	private byte[] fileData = new byte[maxDataSizePerPacketInBytes];
 	private final int INITIALACK = -1;
 	private int currentSeqNumber = -1;
 

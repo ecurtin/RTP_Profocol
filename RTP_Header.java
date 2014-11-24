@@ -1,3 +1,6 @@
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+
 /*
  * 
  */
@@ -34,6 +37,14 @@ public class RTP_Header {
 		header[3] = 0; //create packet number? where should that go?
 		header[4] = createSyncFlagsWindowLine(sync, flags, window_size);
 		header[5] = 0; //checksum filled in by another class.
+	}
+	
+	public byte[] asByteArray(){
+		ByteBuffer byteBuffer = ByteBuffer.allocate(header.length * 4);        
+        IntBuffer intBuffer = byteBuffer.asIntBuffer();
+        intBuffer.put(header);
+
+        return byteBuffer.array();
 	}
 
 	private int packPortNumbers(int source, int dest){

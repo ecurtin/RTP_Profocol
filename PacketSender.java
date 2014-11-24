@@ -22,4 +22,9 @@ public class PacketSender {
 			socket.send(currentPackets[i]);
 		};
 	}
+
+	public void setWindowSize(int windowSize) {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -3,11 +3,11 @@ import java.net.InetAddress;
 
 public class Packet {
 
-	private int[] rpt_packet;
+	protected byte[] rtp_packet;
 	//private int[] header = new int[6]; //this'll integrate somehow with RTPHeader, not sure how yet
 	public RTP_Header header;
 	protected byte[] rtp_data;
-	private InetAddress destinationInetAddress;
+	protected InetAddress destinationInetAddress;
 
 	//RECEIVING END, you don't know what type of packet it is yet
 	public Packet(DatagramPacket datagram) {
@@ -28,13 +28,6 @@ public class Packet {
 
 		// split the new Int buffer into header (frst 6 ints) 
 		// and data(all the rest)
-	}
-
-	// This should probably be implemented by each class individually
-	public void makeRTPPacket() {
-		
-		
-		return;
 	}
 
 	public DatagramPacket packInUDP() {
