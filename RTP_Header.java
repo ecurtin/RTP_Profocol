@@ -1,4 +1,5 @@
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 
 /*
@@ -22,21 +23,28 @@ public class RTP_Header {
 		}
 	}
 	
-	public RTP_Header( int source_ip, 
-		int dest_ip, 
-		int source_port, 
-		int dest_port, 
-		int ack_number, 
-		int sync,
-		int flags,
-		int window_size ) {
-		header = new int[6];
-		header[0] = source_ip;
-		header[1] = dest_ip;
-		header[2] = packPortNumbers(source_port, dest_port);
-		header[3] = 0; //create packet number? where should that go?
-		header[4] = createSyncFlagsWindowLine(sync, flags, window_size);
-		header[5] = 0; //checksum filled in by another class.
+//	public RTP_Header( int source_ip, 
+//		int dest_ip, 
+//		int source_port, 
+//		int dest_port, 
+//		int ack_number, 
+//		int sync,
+//		int flags,
+//		int window_size ) {
+//		header = new int[6];
+//		header[0] = source_ip;
+//		header[1] = dest_ip;
+//		header[2] = packPortNumbers(source_port, dest_port);
+//		header[3] = 0; //create packet number? where should that go?
+//		header[4] = createSyncFlagsWindowLine(sync, flags, window_size);
+//		header[5] = 0; //checksum filled in by another class.
+//	}
+	
+	public RTP_Header(byte[] byteArray) {
+		IntBuffer intBuf = ByteBuffer.wrap(byteArray)
+				     		.order(ByteOrder.BIG_ENDIAN)
+				     		.asIntBuffer();
+				 intBuf.get(header);
 	}
 	
 	public byte[] asByteArray(){

@@ -23,15 +23,20 @@ public class Packet {
 	//Upon receipt
 	public void processDatagram(DatagramPacket datagram){
 		// get datagram data, use ByteBufer to to asInt or whatever
-
-
-
+		byte [] byteArray = datagram.getData();
+		
+		byte[] headerAsBytes = new byte[header.header.length * 4];
+		for(int i = 0; i < headerAsBytes.length; i++) {
+			headerAsBytes[i] = byteArray[i];
+		}
+		header = new RTP_Header(headerAsBytes);
+		
+		//TODO: funnel all the other bytes, if any, into file reconstruction.
 		// split the new Int buffer into header (frst 6 ints) 
 		// and data(all the rest)
 	}
 
 	public DatagramPacket packInUDP() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

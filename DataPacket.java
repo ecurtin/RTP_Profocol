@@ -25,7 +25,7 @@ public class DataPacket extends Packet {
 	}
 	
 	//from oracle docs: DatagramPacket(byte[] buf, int offset, int length, InetAddress address, int port)
-	public DatagramPacket makeDatagramPacket() {
+	public DatagramPacket packInUDP() {
 		makeRTPPacket();
 		return new DatagramPacket(this.rtp_packet,
 									0,
