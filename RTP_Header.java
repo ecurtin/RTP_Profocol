@@ -1,3 +1,6 @@
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+
 /*
  * 
  */
@@ -13,12 +16,10 @@ public class RTP_Header {
 	public int[] header;
 	
 	public RTP_Header() {
-		source_ip = 0;
-		dest_ip = 0;
-		port_numbers = 0;
-		ack_number = 0;
-		sync_flags_window = 0;
-		checksum = 0;
+		header = new int[6];
+		for(int i = 0; i < 6; i++){
+			header[i] = 0;
+		}
 	}
 	
 	public RTP_Header( int source_ip, 
@@ -37,6 +38,14 @@ public class RTP_Header {
 		header[4] = createSyncFlagsWindowLine(sync, flags, window_size);
 		header[5] = 0; //checksum filled in by another class.
 	}
+	
+	public byte[] asByteArray(){
+		ByteBuffer byteBuffer = ByteBuffer.allocate(header.length * 4);        
+        IntBuffer intBuffer = byteBuffer.asIntBuffer();
+        intBuffer.put(header);
+
+        return byteBuffer.array();
+	}
 
 	private int packPortNumbers(int source, int dest){
 		if (source > 32768 || dest > 32768) {
@@ -47,6 +56,30 @@ public class RTP_Header {
 			return (dest | source);
 		}
 	}
+	
+	public boolean setDestinationPort(int dest){
+		if (dest > 32768) {
+			return false; //will not fit into a 16 bit slot;
+		}
+		else {
+			dest = dest << 16;
+			header[2] = (dest | header[2]);
+			return true;
+		}
+	}
+	
+	public boolean setSourcePort(int source){
+		if (source > 32768) {
+			return false; //will not fit into a 16 bit slot;
+		}
+		else {
+			header[2] = ( header[2] | source);
+			return true;
+		}
+	}
+	
+	
+	
 
 	/*
 	 * I'm setting up some basic functionality in this class which I fully expect to get refactored
@@ -86,6 +119,7 @@ public class RTP_Header {
 		sync_flags_window = clear(sync_flags_window, 0);
 	}
 	
+	
 	/*
 	 * The data flag is bit 1 of sync_flags_window set to 1.
 	 */
@@ -97,6 +131,7 @@ public class RTP_Header {
 			sync_flags_window = clear(sync_flags_window, 1);
 		}
 	}
+	
 	
 	/*
 	 * The ack flag is bit 1 of sync_flags_window set to 0.
@@ -110,6 +145,7 @@ public class RTP_Header {
 		}
 	}
 
+	
 	public void setConnectionFlag(boolean bool) {
 		if(bool == true) {
 			sync_flags_window = set(sync_flags_window, 2);
@@ -119,6 +155,7 @@ public class RTP_Header {
 		}
 	}
 	
+	
 	public boolean setWindowSize(int window_size) {
 		if( window_size >  0x1FFFFFFF) {
 			return false; //will not fit
@@ -126,6 +163,19 @@ public class RTP_Header {
 		window_size = window_size << 3;
 		sync_flags_window = sync_flags_window | window_size;
 		return true;
+	}
+	
+	
+	public void setSequenceNumber(int seqnum){
+		header[3] = seqnum;
+	}
+	
+	public void setSourceIP(int source){
+		header[0] = source;
+	}
+	
+	public void setDestIP(int dest) {
+		header[1] = dest;
 	}
 
 	/*---------------------GETTERS---------------------------*/

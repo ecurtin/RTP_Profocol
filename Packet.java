@@ -1,11 +1,13 @@
 import java.net.DatagramPacket;
+import java.net.InetAddress;
 
 public class Packet {
 
-	private int[] rpt_packet;
+	protected byte[] rtp_packet;
 	//private int[] header = new int[6]; //this'll integrate somehow with RTPHeader, not sure how yet
 	public RTP_Header header;
-	private int[] rtp_data;
+	protected byte[] rtp_data;
+	protected InetAddress destinationInetAddress;
 
 	//RECEIVING END, you don't know what type of packet it is yet
 	public Packet(DatagramPacket datagram) {
@@ -28,13 +30,14 @@ public class Packet {
 		// and data(all the rest)
 	}
 
-	// This should probably be implemented by each class individually
-	public DatagramPacket makeDatagramPacket() {
+	public DatagramPacket packInUDP() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
-
 	/*------------------------GETTERS & SETTERS------------------------*/
+
+
 
 	/*
 		returns the int[] inside of RTP_Header
@@ -44,7 +47,7 @@ public class Packet {
 	}
 
 	//
-	public int[] getData() {
+	public byte[] getData() {
 		return rtp_data;
 	}
 
@@ -75,4 +78,42 @@ public class Packet {
 		}
 		return false;
 	}
+	
+	public void setSeqNumber(int i) {
+		header.setSequenceNumber(i);
+	}
+
+	public void setSourceIPAddress(InetAddress sourceAddress) {
+		header.setSourceIP(inetAddressToInt( sourceAddress ));
+		
+	}
+
+	public void setSourcePort(int sourcePort) {
+		header.setSourcePort(sourcePort);
+	}
+
+	public void setDestinationIPAddress(InetAddress destinationAddress) {
+		destinationInetAddress = destinationAddress;
+		header.setDestIP(inetAddressToInt( destinationAddress ));
+		
+	}
+
+	public void setDestinationPort(int destinationPort) {
+		header.setDestinationPort(destinationPort);
+	}
+
+	private int packBytesIntoInt(byte[] bytes) {
+		int ret = 0;
+		for (int i = 0; i < bytes.length; i++) {
+		    ret <<= 8;
+		    ret |= bytes[i] & 0xff;
+		}
+		return ret;
+		
+	}
+	
+	private int inetAddressToInt(InetAddress inet){
+		return packBytesIntoInt( inet.getAddress() );
+	}
+	
 }

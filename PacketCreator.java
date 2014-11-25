@@ -20,10 +20,13 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  */
 public class PacketCreator {
+	
+	private int maxDataSizePerPacketInBytes = 832;
+	
 	private PacketSender packetSender;
 	
 	private String fileName;
-	private byte[] fileData = new byte[832];
+	private byte[] fileData = new byte[maxDataSizePerPacketInBytes];
 	private final int INITIAL_ACK = -1;
 	private int currentSeqNumber = -1;
 	private final int TIMEOUT_SIZE = 250; // ms
@@ -61,7 +64,7 @@ public class PacketCreator {
 	// Creates connection packet
 	private DatagramPacket createConnectPacket() {
 		Packet connectionPacket = new ConnectionPacket();	
-		connectionPacket.setIPAddress(destinationAddress);
+		connectionPacket.setDestinationIPAddress(destinationAddress);
 		connectionPacket.setDestinationPort(destinationPort);
 		DatagramPacket sendingPacket = connectionPacket.packInUDP();
 		return sendingPacket;
