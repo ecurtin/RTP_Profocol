@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -12,18 +13,17 @@ import java.util.Queue;
  * SENDER implementation of a reliable transport protocol.
  *
  */
-public class PacketReceiverForSender implements RTPSenderMethods {
+public class PacketReceiverForServer extends PacketReceiver {
 	private String requestedFile = null;
-	private PacketCreator packetCreator;
-	private DatagramSocket socket;
 	
-	public PacketReceiverForSender(int sourcePort) throws IOException {
+	public PacketReceiverForServer(int sourcePort) throws IOException {
 		// SETUP SERVER
 		DatagramSocket socket = new DatagramSocket(sourcePort);
 		InetAddress sourceAddress = InetAddress.getLocalHost();
-		this.packetCreator = new PacketCreator(socket, sourcePort, sourceAddress);
+		this.packetCreator = new PacketCreatorForServer(socket, sourcePort, sourceAddress);
+		
 		// Size of allowed packet data
-		byte[] receiveData = new byte[1024];
+		byte[] receiveData = new byte[PACKET_SIZE];
 		
 		while(true) {
 			DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
@@ -41,13 +41,13 @@ public class PacketReceiverForSender implements RTPSenderMethods {
 			// Can either be a data ACK or finalizing Connection
 			if (packet.isACK()) {
 				int ACKNumber = packet.getACK();
-				packetCreator.receiveACK(ACKNumber);
+				((PacketCreatorForServer) packetCreator).receiveACK(ACKNumber);
 				
 			// Connection Packet (receive file name to transfer)
 			} else if (packet.isConnection()) {
 				String fileName = packet.getFileName();
 				setFileTransferRequest(fileName);
-				packetCreator.sendConnectionPacket();
+				packetCreator.sendConnectionPacket(-1, "");
 			}
 		}
 	}
@@ -55,7 +55,6 @@ public class PacketReceiverForSender implements RTPSenderMethods {
 	/**
 	 * Tells an application whether or not a file transfer has been requested.
 	 */
-	@Override
 	public String requestingFileTransfer() {
 		return requestedFile;
 	}
@@ -70,8 +69,9 @@ public class PacketReceiverForSender implements RTPSenderMethods {
 	
 	/**
 	 * Called when a file transfer request comes in.
+	 * @throws FileNotFoundException 
 	 */
-	public void setFileTransferRequest(String fileName) {
+	public void setFileTransferRequest(String fileName) throws FileNotFoundException {
 		requestedFile = fileName;
 		packetCreator.setFileName(fileName);
 	}
