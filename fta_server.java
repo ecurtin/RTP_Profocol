@@ -9,6 +9,10 @@ public class fta_server {
 	private static boolean isTerminated = false;
 	public static void main(String[] args) throws IOException {
 		// Has to be odd
+		if (args.length < 3) {
+			System.out.println("Please enter the required parameters.");
+			System.exit(0);
+		}
 		int localPortNumber = Integer.parseInt(args[0]);
 		InetAddress ipAddressOfNetEmu = InetAddress.getByName(args[1]);
 		int udpPortNumberOfNetEmu = Integer.parseInt(args[2]);

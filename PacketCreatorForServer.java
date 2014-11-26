@@ -59,7 +59,7 @@ public class PacketCreatorForServer extends PacketCreator {
 	}
 	
 	// Creates a window size of file packets and places them in the returning queue
-	private Queue<DatagramPacket> createFilePackets() {
+	private Queue<DatagramPacket> createFilePackets() throws IOException {
 		Queue<DatagramPacket> packetsQueue = null;
 		int numberOfPacketsCreated = 0;
 		
@@ -95,7 +95,7 @@ public class PacketCreatorForServer extends PacketCreator {
 	}
 	
 	
-	public void sendDisconnectPackets() {
+	public void sendDisconnectPackets() throws IOException {
 		Packet disconnectPacket = new DisconnectionPacket();
 		
 		// Add appropriate values to disconnect packet header
