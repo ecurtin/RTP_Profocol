@@ -120,6 +120,10 @@ public class Packet {
 	public void setDestinationPort(int destinationPort) {
 		header.setDestinationPort(destinationPort);
 	}
+	
+	public void setData(byte[] bytes) {
+		this.rtp_data = bytes;
+	}
 
 	private int packBytesIntoInt(byte[] bytes) {
 		int ret = 0;
@@ -150,6 +154,16 @@ public class Packet {
 	public boolean validateChecksum() {
 		return true;
 	}
+	
+	public void setFileName(String filename) {
+		byte[] stringAsBytes = filename.getBytes();
+		setData(stringAsBytes);
+	}
+	
+	public String getFileName() {
+		return new String(this.getData());
+	}
+
 
 
 	
