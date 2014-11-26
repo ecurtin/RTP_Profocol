@@ -8,8 +8,8 @@ public class ACKPacket extends Packet {
 		header.setAckFlag(true);
 	}
 	
-	public DatagramPacket makeDatagramPacket() {
-		return null;
-	}
+//	public DatagramPacket makeDatagramPacket() {
+//		return null;
+//	}
 
 }

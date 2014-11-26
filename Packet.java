@@ -35,11 +35,32 @@ public class Packet {
 		// split the new Int buffer into header (frst 6 ints) 
 		// and data(all the rest)
 	}
+	
+	protected void makeRTPPacket() {
+		byte[] headerInBytes = header.asByteArray();
+		//pack with header and data
+		if(rtp_data != null) {
+			rtp_packet = new byte[headerInBytes.length + this.rtp_data.length];
+			
+			for(int i = 0; i < headerInBytes.length; i++) {
+				rtp_packet[i] = headerInBytes[i];
+			}
+			
+			for(int i = 0; i < rtp_data.length; i++) {
+				rtp_packet[i + headerInBytes.length] = rtp_data[i];
+			}
+		}
+		
+		//pack with just header
+		else {
+			rtp_packet = headerInBytes;
+		}
+
+	}
 
 	public DatagramPacket packInUDP() {
-		byte[] headerInBytes = header.asByteArray();
-	
-		return new DatagramPacket(headerInBytes,
+		makeRTPPacket();	
+		return new DatagramPacket(this.rtp_packet,
 									0,
 									rtp_packet.length, 
 									this.destinationInetAddress, 

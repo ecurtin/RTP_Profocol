@@ -8,8 +8,8 @@ public class DisconnectionPacket extends Packet {
 		header.setConnectionFlag(true);
 	}
 	
-	public DatagramPacket makeDatagramPacket() {
-		return null;
-	}
+//	public DatagramPacket makeDatagramPacket() {
+//		return null;
+//	}
 
 }
