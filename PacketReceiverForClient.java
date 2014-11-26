@@ -37,6 +37,8 @@ public class PacketReceiverForClient extends PacketReceiver {
 			byte[] receiveData = new byte[PACKET_SIZE];
 			DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 			
+			socket.receive(receivePacket);
+			
 			// Translate datagram packet into something RTP understands
 			Packet packet = new Packet(receivePacket);
 			

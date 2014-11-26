@@ -36,16 +36,22 @@ public class PacketReceiverForServer extends PacketReceiver {
 			
 			// Translate datagram packet into something RTP understands
 			Packet packet = new Packet(receivePacket);
+			System.out.println("");
+			System.out.println("-------------------------------------");
+			System.out.println("received packet");
+			System.out.println("Is ack: " + packet.isACK());
+			System.out.println("Is connection: " + packet.isConnection());
 			
 			// Can either be a data ACK or finalizing Connection
 			if (packet.isACK()) {
 				int ACKNumber = packet.getACK();
 				((PacketCreatorForServer) packetCreator).receiveACK(ACKNumber);
-				
+				System.out.println("ACKNumber: " + ACKNumber);
 			// Connection Packet (receive file name to transfer)
 			} else if (packet.isConnection()) {
 				String fileName = packet.getFileName();
 				setFileTransferRequest(fileName);
+				System.out.println("Calling for a connection packet to be sent");
 				packetCreator.sendConnectionPacket(-1, "");
 			}
 		}
