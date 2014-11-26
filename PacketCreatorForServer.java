@@ -1,16 +1,17 @@
-import java.io.File;
+//import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+//import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.util.ArrayList;
+//import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Queue;
-import java.util.Timer;
+//import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ConcurrentHashMap;
+//import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -45,6 +46,9 @@ public class PacketCreatorForServer extends PacketCreator {
 	}
 	
 	// Create all file packets and begin to send them a window size at a time to the receiver.
+	/**
+	 * @throws IOException 
+	 */
 	private void sendWindowOfPackets() throws IOException {
 		Queue<DatagramPacket> packetsQueue = (Queue<DatagramPacket>) createFilePackets();
 		int sizeOfQueue = packetsQueue.size();
@@ -59,8 +63,8 @@ public class PacketCreatorForServer extends PacketCreator {
 	}
 	
 	// Creates a window size of file packets and places them in the returning queue
-	private Queue<DatagramPacket> createFilePackets() {
-		Queue<DatagramPacket> packetsQueue = null;
+	private Queue<DatagramPacket> createFilePackets() throws IOException {
+		Queue<DatagramPacket> packetsQueue = new LinkedList<DatagramPacket>(); //changed this from null
 		int numberOfPacketsCreated = 0;
 		
 		while (moreFileDataToPacketize(fileStream) && numberOfPacketsCreated != windowSize) {
@@ -109,8 +113,12 @@ public class PacketCreatorForServer extends PacketCreator {
 		timeoutPackets.add(currentSeqNumber);
 		sentPacketStore.put(currentSeqNumber, udpDisconnectPacket);
 		currentSeqNumber++;
-		
-		packetSender.sendPacket(udpDisconnectPacket);
+		try{
+			packetSender.sendPacket(udpDisconnectPacket);
+		}
+		catch(IOException e) {
+			e.printStackTrace();
+		}
 		timeout.schedule(new DisconnectTask(), TIMEOUT_SIZE);
 	}
 	
