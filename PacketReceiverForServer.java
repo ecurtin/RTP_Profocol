@@ -15,25 +15,24 @@ import java.net.InetAddress;
  */
 public class PacketReceiverForServer extends PacketReceiver {
 	private String requestedFile = null;
+	private boolean isTerminated = false;
 	
-	public PacketReceiverForServer(int sourcePort) throws IOException {
+	public PacketReceiverForServer(int sourcePort, InetAddress destinationAddress, 
+			int destinationPort) throws IOException {
 		// SETUP SERVER
 		DatagramSocket socket = new DatagramSocket(sourcePort);
 		InetAddress sourceAddress = InetAddress.getLocalHost();
+		
 		this.packetCreator = new PacketCreatorForServer(socket, sourcePort, sourceAddress);
+		packetCreator.setDestinationAddress(destinationAddress);
+		packetCreator.setDestinationPort(destinationPort);
 		
 		// Size of allowed packet data
 		byte[] receiveData = new byte[PACKET_SIZE];
 		
-		while(true) {
+		while(!isTerminated) {
 			DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 			socket.receive(receivePacket);
-			
-			// Get and store client IP address and port number
-			InetAddress IPAddress = receivePacket.getAddress();
-			int port = receivePacket.getPort();
-			packetCreator.setDestinationAddress(IPAddress);
-			packetCreator.setDestinationPort(port);
 			
 			// Translate datagram packet into something RTP understands
 			Packet packet = new Packet(receivePacket);
@@ -50,6 +49,11 @@ public class PacketReceiverForServer extends PacketReceiver {
 				packetCreator.sendConnectionPacket(-1, "");
 			}
 		}
+		System.exit(0);
+	}
+	
+	public void terminate() {
+		isTerminated = true;
 	}
 
 	/**

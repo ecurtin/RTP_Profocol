@@ -99,7 +99,7 @@ public class PacketCreatorForServer extends PacketCreator {
 	}
 	
 	
-	public void sendDisconnectPackets() {
+	public void sendDisconnectPackets() throws IOException {
 		Packet disconnectPacket = new DisconnectionPacket();
 		
 		// Add appropriate values to disconnect packet header
