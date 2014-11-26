@@ -5,7 +5,7 @@ public class Packet {
 
 	protected byte[] rtp_packet;
 	//private int[] header = new int[6]; //this'll integrate somehow with RTPHeader, not sure how yet
-	public RTP_Header header;
+	public RTP_Header header = new RTP_Header();
 	protected byte[] rtp_data;
 	protected InetAddress destinationInetAddress;
 
@@ -17,7 +17,7 @@ public class Packet {
 	//SENDING SIDE. empty for now. I think sending should instantiate 
 	//the type of packet that it needs
 	public Packet() {
-
+		header = new RTP_Header();
 	}
 
 	//Upon receipt

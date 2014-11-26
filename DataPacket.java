@@ -3,6 +3,7 @@ import java.net.DatagramPacket;
 public class DataPacket extends Packet {
 	
 	public DataPacket(byte[] data) {
+		header = new RTP_Header();
 		header.setSyncOn();
 		header.setConnectionFlag(false);
 		header.setDataFlag(true);
