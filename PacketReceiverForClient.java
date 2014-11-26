@@ -39,7 +39,7 @@ public class PacketReceiverForClient extends PacketReceiver {
 			Packet packet = new Packet(receivePacket);
 			
 			// Error Check
-			if (packet.validated()) {
+			if (packet.validateChecksum()) {
 				
 				// Send acknowledgment of packets retrieval
 				int ackNumber = packet.getSeqNumber();

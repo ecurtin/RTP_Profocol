@@ -96,7 +96,7 @@ public class PacketCreatorForServer extends PacketCreator {
 	
 	
 	public void sendDisconnectPackets() {
-		Packet disconnectPacket = new DisconnectPacket();
+		Packet disconnectPacket = new DisconnectionPacket();
 		
 		// Add appropriate values to disconnect packet header
 		disconnectPacket.setSourceIPAddress(sourceAddress);

@@ -37,7 +37,13 @@ public class Packet {
 	}
 
 	public DatagramPacket packInUDP() {
-		return null;
+		byte[] headerInBytes = header.asByteArray();
+	
+		return new DatagramPacket(headerInBytes,
+									0,
+									rtp_packet.length, 
+									this.destinationInetAddress, 
+									this.header.getDestPort());
 	}
 
 	/*------------------------GETTERS & SETTERS------------------------*/
@@ -54,6 +60,14 @@ public class Packet {
 	//
 	public byte[] getData() {
 		return rtp_data;
+	}
+	
+	public int getACK() {
+		return header.getPacketNumber();
+	}
+	
+	public int getSeqNumber() {
+		return header.getPacketNumber();
 	}
 
 	public boolean isData() {
@@ -120,5 +134,23 @@ public class Packet {
 	private int inetAddressToInt(InetAddress inet){
 		return packBytesIntoInt( inet.getAddress() );
 	}
+
+	public void setWindowSize(int windowSize) {
+		if(header.setWindowSize(windowSize)) {
+			return;
+		}
+		return; //not catching the "window size too big" at the moment
+		
+	}
+	
+	public int computeChecksum() {
+		return 0;
+	}
+	
+	public boolean validateChecksum() {
+		return true;
+	}
+
+
 	
 }
