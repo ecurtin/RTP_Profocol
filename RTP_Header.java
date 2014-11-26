@@ -70,8 +70,12 @@ public class RTP_Header {
 			return false; //will not fit into a 16 bit slot;
 		}
 		else {
+			//System.out.println("dest: "+dest);
 			dest = dest << 16;
+			//System.out.println("dest shifted: "+dest);
+			//System.out.println("header[2]: "+header[2]);
 			header[2] = (dest | header[2]);
+			//System.out.println("header[2]: "+header[2]);
 			return true;
 		}
 	}
@@ -198,14 +202,21 @@ public class RTP_Header {
 
 	public int getSourcePort() {
 		int source_p = header[2];
-		source_p = source_p ^ 0xFFFF;
-		source_p = source_p >> 16;
+		//System.out.println("getting");
+		//System.out.println("header[2]: "+header[2]);
+		source_p = source_p & 0x0000FFFF;
+		//System.out.println("source_p: "+source_p);
+		//System.out.println("source_p: "+source_p);
 		return source_p;
 	}
 
 	public int getDestPort() {
 		int dest_p = header[2];
-		dest_p = dest_p ^ 0xFFFF0000;
+		//System.out.println("getting");
+		//System.out.println("header[2]: "+header[2]);
+		dest_p = (dest_p & 0xFFFF0000) >> 16;
+		
+		//System.out.println("dest_p: "+dest_p);
 		return dest_p;
 	}
 
