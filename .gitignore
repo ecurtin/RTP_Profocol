@@ -2,6 +2,8 @@ l# Directories #
 /build/
 /bin/
 target/
+
+RTP_HeaderTest.java
  
 # OS Files #
 .DS_Store

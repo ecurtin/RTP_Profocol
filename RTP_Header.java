@@ -103,38 +103,38 @@ public class RTP_Header {
 	 * I'm setting up some basic functionality in this class which I fully expect to get refactored
 	 * and farmed out to other places for cleanliness
 	 */
-	private int createSyncFlagsWindowLine(int sync, int flags, int window_size) {
-		if (sync > 1 || sync < 0 || flags > 1 || flags < 0 || window_size > 268435456 || window_size < 0) {
-			return -1; //one of those is out of bounds of what will fit in the final int
-		}
-		else {
-			if(sync != 0) {
-				setSyncOn();
-			}
-			else {
-				setSyncOff();
-			}
-			if(flags == 0) {
-				setAckFlag(true);
-			}
-			else {
-				setDataFlag(true);
-			}
-			if(flags > 1) {
-				setConnectionFlag(true);
-			}
-			setWindowSize(window_size);
-			return sync_flags_window;
-		}
-	}
+//	private int createSyncFlagsWindowLine(int sync, int flags, int window_size) {
+//		if (sync > 1 || sync < 0 || flags > 1 || flags < 0 || window_size > 268435456 || window_size < 0) {
+//			return -1; //one of those is out of bounds of what will fit in the final int
+//		}
+//		else {
+//			if(sync != 0) {
+//				setSyncOn();
+//			}
+//			else {
+//				setSyncOff();
+//			}
+//			if(flags == 0) {
+//				setAckFlag(true);
+//			}
+//			else {
+//				setDataFlag(true);
+//			}
+//			if(flags > 1) {
+//				setConnectionFlag(true);
+//			}
+//			setWindowSize(window_size);
+//			return sync_flags_window;
+//		}
+//	}
 	
 	public void setSyncOn() {
-		sync_flags_window = set(sync_flags_window, 0);
+		header[4] = set(header[4], 0);
 		
 	}
 	
 	public void setSyncOff() {
-		sync_flags_window = clear(sync_flags_window, 0);
+		header[4] = clear(header[4], 0);
 	}
 	
 	
@@ -143,10 +143,10 @@ public class RTP_Header {
 	 */
 	public void setDataFlag(boolean bool) {
 		if(bool == true) {
-			sync_flags_window = set(sync_flags_window, 1);
+			header[4] = set(header[4], 1);
 		}
 		else {
-			sync_flags_window = clear(sync_flags_window, 1);
+			header[4] = clear(header[4], 1);
 		}
 	}
 	
@@ -156,21 +156,25 @@ public class RTP_Header {
 	 */
 	public void setAckFlag(boolean bool) {
 		if(bool == true) {
-			sync_flags_window = clear(sync_flags_window, 1);
+			header[4] = clear(header[4], 1);
 		}
 		else {
-			sync_flags_window = set(sync_flags_window, 1);
+			header[4] = set(header[4], 1);
 		}
 	}
 
 	
 	public void setConnectionFlag(boolean bool) {
 		if(bool == true) {
-			sync_flags_window = set(sync_flags_window, 2);
+			header[4] = set(header[4], 2);
 		}
 		else {
-			sync_flags_window = clear(sync_flags_window, 1);
+			header[4] = clear(header[4], 2);
 		}
+	}
+	
+	public boolean isConnection() {
+		return isSet(header[4], 2);
 	}
 	
 	
@@ -179,8 +183,8 @@ public class RTP_Header {
 			return false; //will not fit
 		}
 		window_size = window_size << 3;
-		sync_flags_window = sync_flags_window & (0x00000007);
-		sync_flags_window = sync_flags_window | window_size;
+		header[4] = header[4] & (0x00000007);
+		header[4] = header[4] | window_size;
 		return true;
 	}
 	
@@ -250,9 +254,7 @@ public class RTP_Header {
 		return isSet(header[4], 0);
 	}
 
-	public boolean isConnection() {
-		return isSet(header[4], 2);
-	}
+
 
 	public int getChecksum() {
 		return header[5];
