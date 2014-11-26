@@ -6,7 +6,7 @@ import java.net.InetAddress;
 
 public class fta_server {
 	private static PacketReceiverForServer receiver;
-
+	private static boolean isTerminated = false;
 	public static void main(String[] args) throws IOException {
 		// Has to be odd
 		int localPortNumber = Integer.parseInt(args[0]);
@@ -15,13 +15,18 @@ public class fta_server {
 		
 		receiver = new PacketReceiverForServer(localPortNumber, ipAddressOfNetEmu, udpPortNumberOfNetEmu);
 		
-		BufferedReader buffer = new BufferedReader(new InputStreamReader(System.in));
-		System.out.println("Enter command: ");
-		
-		String command = buffer.readLine();
-		if (command.equals("terminate")) {
-			receiver.terminate();
+		while (!isTerminated) {
+			BufferedReader buffer = new BufferedReader(new InputStreamReader(System.in));
+			System.out.println("Enter command: ");
+			
+			String command = buffer.readLine();
+			
+			if (command.equals("terminate")) {
+				receiver.terminate();
+				isTerminated = true;
+			}
 		}
+		System.exit(0);
 	}
 
 }

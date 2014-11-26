@@ -15,6 +15,7 @@ import java.util.Queue;
  */
 public class PacketReceiverForServer extends PacketReceiver {
 	private String requestedFile = null;
+	private boolean isTerminated = false;
 	
 	public PacketReceiverForServer(int sourcePort, InetAddress destinationAddress, 
 			int destinationPort) throws IOException {
@@ -29,7 +30,7 @@ public class PacketReceiverForServer extends PacketReceiver {
 		// Size of allowed packet data
 		byte[] receiveData = new byte[PACKET_SIZE];
 		
-		while(true) {
+		while(!isTerminated) {
 			DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 			socket.receive(receivePacket);
 			
@@ -48,6 +49,11 @@ public class PacketReceiverForServer extends PacketReceiver {
 				packetCreator.sendConnectionPacket(-1, "");
 			}
 		}
+		System.exit(0);
+	}
+	
+	public void terminate() {
+		isTerminated = true;
 	}
 
 	/**
