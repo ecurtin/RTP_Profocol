@@ -1,13 +1,15 @@
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.util.zip.Adler32;
 
 public class Packet {
-
+	
 	protected byte[] rtp_packet;
 	//private int[] header = new int[6]; //this'll integrate somehow with RTPHeader, not sure how yet
 	public RTP_Header header = new RTP_Header();
 	protected byte[] rtp_data;
 	protected InetAddress destinationInetAddress;
+	protected Adler32 checksumValidator = new Adler32();
 
 	//RECEIVING END, you don't know what type of packet it is yet
 	public Packet(DatagramPacket datagram) {
@@ -173,6 +175,16 @@ public class Packet {
 	}
 	
 	public boolean validateChecksum() {
+/*		checksumValidator.reset();
+		// TODO: Figure out how to get the byte array of the received packet without it's checksum
+		checksumValidator.update();
+		long packetsCurrentChecksum = checksumValidator.getValue();
+		checksumValidator.reset();
+		
+		if (packetsCurrentChecksum == header.getChecksum()) {
+			return true;
+		}
+		return false;*/
 		return true;
 	}
 	
