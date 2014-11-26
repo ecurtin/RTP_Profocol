@@ -41,6 +41,11 @@ public class RTP_Header {
 //	}
 	
 	public RTP_Header(byte[] byteArray) {
+		header = new int[6];
+		for(int i = 0; i < 6; i++){
+			header[i] = 0;
+		}
+		
 		IntBuffer intBuf = ByteBuffer.wrap(byteArray)
 				     		.order(ByteOrder.BIG_ENDIAN)
 				     		.asIntBuffer();
@@ -48,6 +53,7 @@ public class RTP_Header {
 	}
 	
 	public byte[] asByteArray(){
+		
 		ByteBuffer byteBuffer = ByteBuffer.allocate(header.length * 4);        
         IntBuffer intBuffer = byteBuffer.asIntBuffer();
         intBuffer.put(header);
@@ -55,16 +61,16 @@ public class RTP_Header {
         return byteBuffer.array();
 	}
 
-	private int packPortNumbers(int source, int dest){
-		if (source > 32768 || dest > 32768) {
-			return -1; //will not fit into a 16 bit slot;
-		}
-		else {
-			dest = dest << 16;
-			return (dest | source);
-		}
-	}
-	
+//	private int packPortNumbers(int source, int dest){
+//		if (source > 32768 || dest > 32768) {
+//			return -1; //will not fit into a 16 bit slot;
+//		}
+//		else {
+//			dest = dest << 16;
+//			return (dest | source);
+//		}
+//	}
+//	
 	public boolean setDestinationPort(int dest){
 		if (dest > 32768) {
 			return false; //will not fit into a 16 bit slot;
@@ -173,6 +179,7 @@ public class RTP_Header {
 			return false; //will not fit
 		}
 		window_size = window_size << 3;
+		sync_flags_window = sync_flags_window & (0x00000007);
 		sync_flags_window = sync_flags_window | window_size;
 		return true;
 	}
