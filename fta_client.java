@@ -10,9 +10,23 @@ public class fta_client {
 	
 	public static void main(String[] args) throws IOException {
 		// Must be even number port
-		int localPortNumber = Integer.parseInt(args[0]);
-		InetAddress ipAddressOfNetEmu = InetAddress.getByName(args[1]);
-		int udpPortNumberOfNetEmu = Integer.parseInt(args[2]);
+		if (args.length < 3) {
+			printUsageAndExit();
+		}
+		
+		int localPortNumber = 0;
+		InetAddress ipAddressOfNetEmu = null;
+		int udpPortNumberOfNetEmu = 0;
+		
+		try {
+			localPortNumber = Integer.parseInt(args[0]);
+			ipAddressOfNetEmu = InetAddress.getByName(args[1]);
+			udpPortNumberOfNetEmu = Integer.parseInt(args[2]);
+		}
+		catch (Exception e) {
+			printUsageAndExit();
+		}
+		
 		int windowSize = 0;
 		
 		while (true) {
@@ -34,6 +48,11 @@ public class fta_client {
 				windowSize = Integer.parseInt(command.substring(7));
 			}
 		}
+	}
+	
+	public static void printUsageAndExit() {
+		System.out.println("Usage: fta_client [LocalPort] [NetEmuAddress] [NetEmuPort]");
+		System.exit(0);
 	}
 
 }
