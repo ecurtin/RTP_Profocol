@@ -40,7 +40,7 @@ public class PacketReceiverForSender implements RTPSenderMethods {
 			
 			// Can either be a data ACK or finalizing Connection
 			if (packet.isACK()) {
-				int ACKNumber = packet.getACKNumber();
+				int ACKNumber = packet.getACK();
 				packetCreator.receiveACK(ACKNumber);
 				
 			// Connection Packet (receive file name to transfer)

@@ -2,7 +2,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
-import java.util.Queue;
 
 public class PacketSender {
 	private DatagramSocket socket;
@@ -21,10 +20,5 @@ public class PacketSender {
 		for (int i = 0; i < packets.length; i++) {
 			socket.send(currentPackets[i]);
 		};
-	}
-
-	public void setWindowSize(int windowSize) {
-		// TODO Auto-generated method stub
-		
 	}
 }

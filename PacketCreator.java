@@ -7,8 +7,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -26,9 +24,10 @@ public class PacketCreator {
 	private PacketSender packetSender;
 	
 	private String fileName;
+	private FileInputStream fileStream;
 	private byte[] fileData = new byte[maxDataSizePerPacketInBytes];
 	private final int INITIAL_ACK = -1;
-	private int currentSeqNumber = -1;
+	private int currentSeqNumber = 0;
 	private final int TIMEOUT_SIZE = 250; // ms
 
 	private InetAddress destinationAddress;
@@ -38,7 +37,9 @@ public class PacketCreator {
 	private int sourcePort;
 	
 	private Timer timeout = new Timer();
-	private boolean sendMorePackets = true;
+	private boolean moreDataPackets = true;
+	private boolean disconnected = false;
+	
 	private boolean isConnected = false;
 	private ConcurrentHashMap<Integer, DatagramPacket> sentPacketStore 
 		= new ConcurrentHashMap<Integer, DatagramPacket>();
@@ -84,7 +85,7 @@ public class PacketCreator {
 			// Begin sending file if ACK was for connection
 			if (isConnectionACK(ackNumber)) {
 				isConnected = true;
-				sendFile();
+				sendWindowOfPackets();
 			}
 		}
 	}
@@ -97,61 +98,56 @@ public class PacketCreator {
 		sentPacketStore.remove(key);
 	}
 	
+	private DatagramPacket getPacketFromStorage(Integer key) {
+		return sentPacketStore.get(key);
+	}
+	
 	private boolean isConnectionACK(int ackNumber) {
 		return ackNumber == -1;
 	}
 	
 	// Create all file packets and begin to send them a window size at a time to the receiver.
-	private void sendFile() throws IOException {
+	private void sendWindowOfPackets() throws IOException {
 		Queue<DatagramPacket> packetsQueue = (Queue<DatagramPacket>) createFilePackets();
+		int sizeOfQueue = packetsQueue.size();
+		DatagramPacket[] packetsToBeSent = new DatagramPacket[sizeOfQueue];
 		
-		// While we still have packets to send...
-		while (!packetsQueue.isEmpty()) {
-
-			// While we aren't waiting for ACK's to be received
-			while(sendMorePackets) {
-				sendMorePackets = false;
-				
-				int numberOfPacketsToSend;
-				int numberOfTotalPacketsLeft = packetsQueue.size();
-				
-				if (numberOfTotalPacketsLeft > windowSize) {
-					numberOfPacketsToSend = windowSize;
-				} else {
-					numberOfPacketsToSend = numberOfTotalPacketsLeft;
-				}
-				
-				DatagramPacket[] packetsToBeSent = new DatagramPacket[numberOfPacketsToSend];
-				
-				for(int i = 0; i < numberOfPacketsToSend; i++) {
-					packetsToBeSent[i] = packetsQueue.remove();
-				};
-				
-				packetSender.sendPackets(packetsToBeSent);
-				timeout.schedule(new TimeoutTask(), TIMEOUT_SIZE);
-			};
+		for(int i = 0; i < sizeOfQueue; i++) {
+			packetsToBeSent[i] = packetsQueue.remove();
 		};
+		
+		packetSender.sendPackets(packetsToBeSent);
+		timeout.schedule(new TimeoutTask(), TIMEOUT_SIZE);
 	}
 	
-	// Creates all file packets at once and places them in the returning queue
-	private Queue<DatagramPacket> createFilePackets() throws FileNotFoundException {
-		FileInputStream fileStream = new FileInputStream(fileName);
+	// Creates a window size of file packets and places them in the returning queue
+	private Queue<DatagramPacket> createFilePackets() {
 		Queue<DatagramPacket> packetsQueue = null;
+		int numberOfPacketsCreated = 0;
 		
-		while (moreFileDataToPacketize(fileStream)) {
+		while (moreFileDataToPacketize(fileStream) && numberOfPacketsCreated != windowSize) {
 			// Store as much data from the file as you can into fileData
 			fileStream.read(fileData);
 			DataPacket dataPacket = new DataPacket(fileData);
 			
 			// Set all of the header values
-			dataPacket.setSeqNumber(currentSeqNumber++);
+			dataPacket.setSeqNumber(currentSeqNumber);
 			dataPacket.setSourceIPAddress(sourceAddress);
 			dataPacket.setSourcePort(sourcePort);
 			dataPacket.setDestinationIPAddress(destinationAddress);
 			dataPacket.setDestinationPort(destinationPort);
 			DatagramPacket sendPacket = dataPacket.packInUDP();
 			
+			// Add data packet to list of sent packets and storage
+			timeoutPackets.add(currentSeqNumber);
+			sentPacketStore.put(currentSeqNumber, sendPacket);
+			
+			numberOfPacketsCreated++;
+			currentSeqNumber++;
 			packetsQueue.add(sendPacket);
+		}
+		if (!moreFileDataToPacketize(fileStream)) {
+			moreDataPackets = false;
 		}
 		return packetsQueue;
 	}
@@ -161,9 +157,23 @@ public class PacketCreator {
 	}
 	
 	
-	public DatagramPacket[] createDisconnectPackets() {
-		//TODO: Implement packet disconnection creation
-		return null;
+	public void sendDisconnectPackets() {
+		Packet disconnectPacket = new DisconnectPacket();
+		
+		// Add appropriate values to disconnect packet header
+		disconnectPacket.setSourceIPAddress(sourceAddress);
+		disconnectPacket.setSourcePort(sourcePort);
+		disconnectPacket.setDestinationIPAddress(destinationAddress);
+		disconnectPacket.setDestinationPort(destinationPort);
+		disconnectPacket.setSeqNumber(currentSeqNumber);
+		DatagramPacket udpDisconnectPacket = disconnectPacket.packInUDP();
+		
+		timeoutPackets.add(currentSeqNumber);
+		sentPacketStore.put(currentSeqNumber, udpDisconnectPacket);
+		currentSeqNumber++;
+		
+		packetSender.sendPacket(udpDisconnectPacket);
+		timeout.schedule(new DisconnectTask(), TIMEOUT_SIZE);
 	}
 
 	public void setDestinationAddress(InetAddress destinationAddress) {
@@ -171,8 +181,9 @@ public class PacketCreator {
 		
 	}
 
-	public void setFileName(String fileName) {
+	public void setFileName(String fileName) throws FileNotFoundException {
 		this.fileName = fileName;
+		fileStream = new FileInputStream(fileName);
 	}
 	
 	public void setWindowSize(int windowSize) {
@@ -200,12 +211,19 @@ public class PacketCreator {
 				while(!allACK()) {
 					Thread.sleep(TIMEOUT_SIZE);
 				}
-				sendMorePackets = true;
+				// If all are ACK'd send next window size of data packets
+				timeoutPackets.clear();
+				if (moreDataPackets) {
+					sendWindowOfPackets();
+				} else {
+					sendDisconnectPackets();
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 		
+		// Determines which packets have not been ACK'd
 		private boolean allACK() throws IOException {
 			boolean isDone = true;
 			int numberOfTimeoutPackets = timeoutPackets.size();
@@ -214,20 +232,58 @@ public class PacketCreator {
 			
 			for (int i = 0; i < numberOfTimeoutPackets; i++) {
 				// Get the packet sequence numbers sent
-				int ack = timeoutPackets.get(i);
+				int seqNumber = timeoutPackets.get(i);
 				
 				// Packet has not been ack'd
-				if (sentPacketStore.containsKey(ack)) {
-					resentPackets[missingPacketCounter] = sentPacketStore.get(ack);
+				if (storageContainsPacket(seqNumber)) {
+					resentPackets[missingPacketCounter] = getPacketFromStorage(seqNumber);
 					missingPacketCounter++;
 					isDone = false;
 				}
 			}
 			// Resend all non-ack'd packets
-			packetSender.sendPackets(resentPackets);
+			if (!isDone) {
+				packetSender.sendPackets(resentPackets);
+			}
 			return isDone;
 		}
+	}
+	
+	/**
+	 * Responsible for running the disconnect timeout task. It checks whether or 
+	 * not the disconnect ACK has been received. If it has not, we resend
+	 * @author Tommy
+	 *
+	 */
+	class DisconnectTask extends TimerTask {
+
+		@Override
+		public void run() {
+			try {
+				while(!disconnectACK()) {
+					Thread.sleep(TIMEOUT_SIZE);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			timeoutPackets.clear();
+		}
 		
+		// Determines if we received the disconnect ACK
+		private boolean disconnectACK() throws IOException {
+			boolean ackReceived = false;
+			DatagramPacket resentPacket = null;
+			int seqNumber = timeoutPackets.get(0);
+			
+			if (storageContainsPacket(seqNumber)) {
+				ackReceived = true;
+				resentPacket = getPacketFromStorage(seqNumber);
+				packetSender.sendPacket(resentPacket);
+			}
+			
+			return ackReceived;
+			
+		}
 	}
 	
 }
