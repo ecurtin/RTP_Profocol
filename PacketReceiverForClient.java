@@ -27,7 +27,9 @@ public class PacketReceiverForClient extends PacketReceiver {
 		DatagramSocket socket = new DatagramSocket(sourcePort);
 		InetAddress sourceAddress = InetAddress.getLocalHost();
 		this.packetCreator = new PacketCreatorForClient(socket, sourcePort, sourceAddress);
-
+		this.packetCreator.setDestinationAddress(destinationAddress);
+		this.packetCreator.setDestinationPort(destinationPort);
+		
 		packetCreator.sendConnectionPacket(windowSize, fileName);
 		
 		while(!isDisconnected) {
