@@ -21,7 +21,10 @@ public class fta_client {
 			
 			String command = buffer.readLine();
 			
-			if (command.substring(0, 11).equals("connect-get")) {
+			if (command.substring(0, 6).equals("window")) {
+				windowSize = Integer.parseInt(command.substring(7));
+				
+			} else if (command.substring(0, 11).equals("connect-get")) {
 				String fileName = command.substring(12);
 				if (windowSize < 1) {
 					System.out.println("Please enter a valid window size.");
@@ -29,9 +32,6 @@ public class fta_client {
 					receiver = new PacketReceiverForClient(localPortNumber, ipAddressOfNetEmu, 
 							udpPortNumberOfNetEmu, fileName, windowSize);
 				}
-				
-			} else if (command.substring(0, 6).equals("window")) {
-				windowSize = Integer.parseInt(command.substring(7));
 			}
 		}
 	}
