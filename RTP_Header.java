@@ -157,12 +157,27 @@ public class RTP_Header {
 	public void setAckFlag(boolean bool) {
 		if(bool == true) {
 			header[4] = clear(header[4], 1);
+			System.out.println("clearing bit 1 of header[4]");
 		}
 		else {
 			header[4] = set(header[4], 1);
+			System.out.println("setting bit 1 of header[4]");
 		}
 	}
 
+	public boolean isACK() {
+		System.out.println("checking isSet(), it is :");
+		if(isSet(header[4], 1)){
+			System.out.println("true, therefore this is a data packet");
+			return false;
+		}
+		else {
+			System.out.println("false, therefore this is an ack packet");
+			return true;
+		}
+		//return (!isSet(header[4], 1));
+	}
+	
 	
 	public void setConnectionFlag(boolean bool) {
 		if(bool == true) {
@@ -246,9 +261,7 @@ public class RTP_Header {
 		return isSet(header[4], 1);
 	}
 
-	public boolean isACK() {
-		return (!isSet(header[4], 1));
-	}
+
 
 	public boolean isSync() {
 		return isSet(header[4], 0);
@@ -294,10 +307,11 @@ public class RTP_Header {
 	//Ex: bits = 1010, index = 1, mask = 0010
 	//All other 1's fall through XOR, excepted masked bit
 	//1010 XOR 0010 = 1000 
+			
 		int mask = 1;
 		mask = mask << index;
 
-		bits = bits ^ (mask);
+		bits = bits & ~(mask);
 		return bits;
 	}
 
