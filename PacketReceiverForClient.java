@@ -42,9 +42,11 @@ public class PacketReceiverForClient extends PacketReceiver {
 			
 			// Translate datagram packet into something RTP understands
 			Packet packet = new Packet(receivePacket);
+			packet.makeRTPPacket();
 			System.out.println();
 			System.out.println("---------------------------------");
 			// Error Check
+			System.out.println("Received Valid packet: "+ packet.validateChecksum());
 			System.out.println("Received Connection packet: " + packet.isConnection());
 			System.out.println("Received Data packet: " + packet.isData());
 			if (packet.validateChecksum()) {

@@ -66,6 +66,7 @@ public class Packet {
 
 	public DatagramPacket packInUDP() {
 		makeRTPPacket();
+		setChecksum(computeChecksum());
 		return new DatagramPacket(this.rtp_packet,
 									0,
 									rtp_packet.length, 
@@ -179,9 +180,25 @@ public class Packet {
 	}
 	
 	public int computeChecksum() {
+//		checksumValidator.reset();
+//		if(rtp_packet != null) {
+//			checksumValidator.update(rtp_packet, 4, (rtp_packet.length - 4));
+//		}
+//		
+//		//checksum returns a long, mod by int max value to make it fit into an int
+//		//this isn't part of the algorithm, but it is repeatable and should not effect
+//		//validation
+//		int checksumAsInt = (int) checksumValidator.getValue() % Integer.MAX_VALUE;
+//		
+//		return checksumAsInt;
+		
 		return 0;
 	}
 	
+	public void setChecksum(int value) {
+		header.setChecksum(value);
+	}
+
 	public boolean validateChecksum() {
 /*		checksumValidator.reset();
 		// TODO: Figure out how to get the byte array of the received packet without it's checksum
@@ -193,6 +210,17 @@ public class Packet {
 			return true;
 		}
 		return false;*/
+		
+//		makeRTPPacket();
+//		int computedChecksum = computeChecksum();
+//		
+//		if(computedChecksum != header.getChecksum()) {
+//			return false;
+//		}
+//		else {
+//			return true;
+//		}
+		
 		return true;
 	}
 	
