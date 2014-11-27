@@ -38,7 +38,7 @@ public class PacketCreatorForServer extends PacketCreator {
 			removePacketFromStorage(ackNumber);
 
 			// Begin sending file if ACK was for connection
-			if (isConnectionACK(ackNumber)) {
+			if (!isConnected) {
 				isConnected = true;
 				sendWindowOfPackets();
 			}

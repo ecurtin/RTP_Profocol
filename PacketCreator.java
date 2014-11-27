@@ -141,6 +141,7 @@ public class PacketCreator {
 				e.printStackTrace();
 			}
 			timeoutPackets.clear();
+			System.out.println("TIMEOUT THREAD ENDED");
 		}
 		
 		// Determines if we received the connection ACK
@@ -148,6 +149,7 @@ public class PacketCreator {
 			boolean haveConnection = true;
 			DatagramPacket resentPacket = null;
 			int seqNumber = timeoutPackets.get(0);
+			System.out.println("TimeoutPacket Seq Num: " + seqNumber);
 			
 			if (storageContainsPacket(seqNumber)) {
 				haveConnection = false;

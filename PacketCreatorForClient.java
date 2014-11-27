@@ -28,7 +28,6 @@ class PacketCreatorForClient extends PacketCreator {
 		createdPacket.setDestinationIPAddress(destinationAddress);
 		createdPacket.setDestinationPort(destinationPort);
 		DatagramPacket packetToBeSent = createdPacket.packInUDP();
-		
 		return packetToBeSent;
 	}
 }

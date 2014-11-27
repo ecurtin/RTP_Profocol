@@ -42,24 +42,29 @@ public class PacketReceiverForClient extends PacketReceiver {
 			
 			// Translate datagram packet into something RTP understands
 			Packet packet = new Packet(receivePacket);
-			
+			System.out.println();
+			System.out.println("---------------------------------");
 			// Error Check
 			if (packet.validateChecksum()) {
 				
 				// Send acknowledgment of packets retrieval
-				int ackNumber = packet.getSeqNumber();
-				((PacketCreatorForClient) packetCreator).sendACK(ackNumber);
+				int seqNumber = packet.getSeqNumber();
+				System.out.println("Sending ACK..." + seqNumber);
+				((PacketCreatorForClient) packetCreator).sendACK(seqNumber);
 				
 				// Can either be a data ACK or finalizing Connection
 				if (packet.isData()) {
 					// Store file data to be parsed after receiving entire file
-					dataStore.put(ackNumber, packet.getData());
+					dataStore.put(seqNumber, packet.getData());
+					System.out.println("RECEIVING DATA - SEQ NUMBER: " + seqNumber);
 
 				} else if (packet.isConnection()) {
 					packetCreator.removePacketFromStorage(INITIAL_ACK);
+					System.out.println("RECEIVING CONNECTION PACKET");
 					
 				} else if (packet.isDisconnection()) {
 					isDisconnected = true;
+					System.out.println("DISCONNECTING");
 				}
 			}
 		}

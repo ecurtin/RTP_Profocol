@@ -41,7 +41,7 @@ public class PacketReceiverForServer extends PacketReceiver {
 			System.out.println("received packet");
 			System.out.println("Is ack: " + packet.isACK());
 			System.out.println("Is connection: " + packet.isConnection());
-			
+			System.out.println("SEQ/ACK Number: " + packet.getACK());
 			// Can either be a data ACK or finalizing Connection
 			if (packet.isACK()) {
 				int ACKNumber = packet.getACK();
