@@ -157,22 +157,22 @@ public class RTP_Header {
 	public void setAckFlag(boolean bool) {
 		if(bool == true) {
 			header[4] = clear(header[4], 1);
-			System.out.println("clearing bit 1 of header[4]");
+			//System.out.println("clearing bit 1 of header[4]");
 		}
 		else {
 			header[4] = set(header[4], 1);
-			System.out.println("setting bit 1 of header[4]");
+			//System.out.println("setting bit 1 of header[4]");
 		}
 	}
 
 	public boolean isACK() {
-		System.out.println("checking isSet(), it is :");
+		//System.out.println("checking isSet(), it is :");
 		if(isSet(header[4], 1)){
-			System.out.println("true, therefore this is a data packet");
+			//System.out.println("true, therefore this is a data packet");
 			return false;
 		}
 		else {
-			System.out.println("false, therefore this is an ack packet");
+			//System.out.println("false, therefore this is an ack packet");
 			return true;
 		}
 		//return (!isSet(header[4], 1));
