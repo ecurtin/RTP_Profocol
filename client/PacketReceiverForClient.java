@@ -1,13 +1,14 @@
-//import java.io.BufferedReader;
-//import java.io.File;
+package client;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-//import java.net.SocketException;
-//import java.net.UnknownHostException;
+
 import java.util.HashMap;
+
+import shared.Packet;
+import shared.PacketReceiver;
 
 /**
  * This class is responsible for interfacing between an application and our 
