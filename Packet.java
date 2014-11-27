@@ -105,7 +105,7 @@ public class Packet {
 	}
 
 	public boolean isConnection() {
-		if( header.isSync() && header.isConnection()) {
+		if( header.isSync() && header.isConnection() && !header.isACK()) {
 			return true;
 		}
 		return false;
