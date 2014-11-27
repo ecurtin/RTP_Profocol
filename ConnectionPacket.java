@@ -1,4 +1,3 @@
-import java.net.DatagramPacket;
 
 public class ConnectionPacket extends Packet {
 
