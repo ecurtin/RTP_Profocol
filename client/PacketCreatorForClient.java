@@ -1,8 +1,13 @@
+package client;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+
+import shared.ACKPacket;
+import shared.Packet;
+import shared.PacketCreator;
 
 /**
  * Specialized packet creator for the client.

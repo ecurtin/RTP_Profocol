@@ -1,3 +1,4 @@
+package shared;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -86,7 +87,7 @@ public class PacketCreator {
 		return sentPacketStore.containsKey(key);
 	}
 	
-	protected void removePacketFromStorage(Integer key) {
+	public void removePacketFromStorage(Integer key) {
 		sentPacketStore.remove(key);
 	}
 	

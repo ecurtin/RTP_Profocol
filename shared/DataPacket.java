@@ -1,3 +1,4 @@
+package shared;
 import java.net.DatagramPacket;
 
 public class DataPacket extends Packet {

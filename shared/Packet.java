@@ -1,3 +1,4 @@
+package shared;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.util.zip.Adler32;
