@@ -30,6 +30,7 @@ public class PacketReceiverForClient extends PacketReceiver {
 		this.packetCreator.setDestinationAddress(destinationAddress);
 		this.packetCreator.setDestinationPort(destinationPort);
 		
+		System.out.println("sending packet");
 		packetCreator.sendConnectionPacket(windowSize, fileName);
 		
 		while(!isDisconnected) {

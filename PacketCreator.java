@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -107,8 +108,8 @@ public class PacketCreator {
 	}
 
 	public void setFileName(String fileName) throws FileNotFoundException {
-		this.fileName = fileName;
-		fileStream = new FileInputStream(fileName);
+		File file = new File(fileName.trim());
+		fileStream = new FileInputStream(file);
 	}
 	
 	public void setWindowSize(int windowSize) {
