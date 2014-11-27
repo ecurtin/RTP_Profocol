@@ -96,6 +96,10 @@ public class Packet {
 	public int getSeqNumber() {
 		return header.getPacketNumber();
 	}
+	
+	public int getWindowSize() {
+		return header.getWindowSize();
+	}
 
 	public boolean isData() {
 		if( header.isData() ){
