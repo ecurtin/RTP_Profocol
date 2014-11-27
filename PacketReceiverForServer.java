@@ -52,6 +52,7 @@ public class PacketReceiverForServer extends PacketReceiver {
 				String fileName = packet.getFileName();
 				System.out.println("Requested File: " + fileName);
 				setFileTransferRequest(fileName);
+				setWindowSize(packet.getWindowSize());
 				System.out.println("Calling for a connection packet to be sent");
 				packetCreator.sendConnectionPacket(-1, "");
 			}

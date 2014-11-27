@@ -36,9 +36,12 @@ public class PacketCreatorForServer extends PacketCreator {
 		// Check for packet that we received ACK for
 		if (storageContainsPacket(ackNumber)) {
 			removePacketFromStorage(ackNumber);
-
+			System.out.println("Removing packet " + ackNumber + " from storage.");
 			// Begin sending file if ACK was for connection
 			if (!isConnected) {
+				System.out.println("~~~~~~~~~~~~~~~~~~~~~");
+				System.out.println("We are now connected.");
+				System.out.println("~~~~~~~~~~~~~~~~~~~~~");
 				isConnected = true;
 				sendWindowOfPackets();
 			}
@@ -54,11 +57,14 @@ public class PacketCreatorForServer extends PacketCreator {
 		int sizeOfQueue = packetsQueue.size();
 		DatagramPacket[] packetsToBeSent = new DatagramPacket[sizeOfQueue];
 		
+		System.out.println("Created some packets...");
+		
 		for(int i = 0; i < sizeOfQueue; i++) {
 			packetsToBeSent[i] = packetsQueue.remove();
 		};
 		
 		packetSender.sendPackets(packetsToBeSent);
+		System.out.println("Sent those packets.");
 		timeout.schedule(new TimeoutTask(), TIMEOUT_SIZE);
 	}
 	
@@ -66,7 +72,8 @@ public class PacketCreatorForServer extends PacketCreator {
 	private Queue<DatagramPacket> createFilePackets() throws IOException {
 		Queue<DatagramPacket> packetsQueue = new LinkedList<DatagramPacket>(); //changed this from null
 		int numberOfPacketsCreated = 0;
-		
+		System.out.println("Window size:" + windowSize);
+		System.out.println("More data: " + moreFileDataToPacketize(fileStream));
 		while (moreFileDataToPacketize(fileStream) && numberOfPacketsCreated != windowSize) {
 			// Store as much data from the file as you can into fileData
 			fileStream.read(fileData);
@@ -83,7 +90,10 @@ public class PacketCreatorForServer extends PacketCreator {
 			// Add data packet to list of sent packets and storage
 			timeoutPackets.add(currentSeqNumber);
 			sentPacketStore.put(currentSeqNumber, sendPacket);
-			
+			System.out.println();
+			System.out.println("Sequence Number: " + currentSeqNumber);
+			System.out.println("TimeoutPackets:");
+			System.out.println(timeoutPackets.toString());
 			numberOfPacketsCreated++;
 			currentSeqNumber++;
 			packetsQueue.add(sendPacket);

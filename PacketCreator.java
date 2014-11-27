@@ -69,6 +69,7 @@ public class PacketCreator {
 		connectionPacket.setDestinationPort(destinationPort);
 		connectionPacket.setSeqNumber(INITIAL_ACK);
 		
+		System.out.println("WINDOW SIZE: " + windowSize);
 		if (windowSize > 0) {
 			connectionPacket.setWindowSize(windowSize);
 			connectionPacket.setFileName(fileName);
@@ -159,5 +160,9 @@ public class PacketCreator {
 			
 			return haveConnection;
 		}
+	}
+
+	public void clearTimeoutPacket() {
+		timeoutPackets.clear();
 	}
 }

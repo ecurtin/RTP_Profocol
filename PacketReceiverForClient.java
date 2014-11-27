@@ -45,6 +45,8 @@ public class PacketReceiverForClient extends PacketReceiver {
 			System.out.println();
 			System.out.println("---------------------------------");
 			// Error Check
+			System.out.println("Received Connection packet: " + packet.isConnection());
+			System.out.println("Received Data packet: " + packet.isData());
 			if (packet.validateChecksum()) {
 				
 				// Send acknowledgment of packets retrieval
@@ -59,8 +61,9 @@ public class PacketReceiverForClient extends PacketReceiver {
 					System.out.println("RECEIVING DATA - SEQ NUMBER: " + seqNumber);
 
 				} else if (packet.isConnection()) {
+					System.out.println("Removing Packet from storage: " + INITIAL_ACK);
 					packetCreator.removePacketFromStorage(INITIAL_ACK);
-					System.out.println("RECEIVING CONNECTION PACKET");
+					packetCreator.clearTimeoutPacket();
 					
 				} else if (packet.isDisconnection()) {
 					isDisconnected = true;
