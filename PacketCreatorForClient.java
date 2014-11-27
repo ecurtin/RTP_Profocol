@@ -24,10 +24,9 @@ class PacketCreatorForClient extends PacketCreator {
 		
 		createdPacket.setSeqNumber(ackNumber);
 		createdPacket.setSourceIPAddress(sourceAddress);
-		createdPacket.setSourcePort(ackNumber);
+		createdPacket.setSourcePort(sourcePort);
 		createdPacket.setDestinationIPAddress(destinationAddress);
 		createdPacket.setDestinationPort(destinationPort);
-		
 		DatagramPacket packetToBeSent = createdPacket.packInUDP();
 		
 		return packetToBeSent;

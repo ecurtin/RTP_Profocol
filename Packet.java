@@ -65,7 +65,7 @@ public class Packet {
 	}
 
 	public DatagramPacket packInUDP() {
-		makeRTPPacket();	
+		makeRTPPacket();
 		return new DatagramPacket(this.rtp_packet,
 									0,
 									rtp_packet.length, 
