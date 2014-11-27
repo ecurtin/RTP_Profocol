@@ -181,6 +181,10 @@ public class PacketCreatorForServer extends PacketCreator {
 		}
 	}
 	
+	public boolean doneSending() {
+		return !moreDataPackets;
+	}
+	
 	/**
 	 * Responsible for running the disconnect timeout task. It checks whether or 
 	 * not the disconnect ACK has been received. If it has not, we resend

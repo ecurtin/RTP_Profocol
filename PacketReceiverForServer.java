@@ -56,6 +56,11 @@ public class PacketReceiverForServer extends PacketReceiver {
 				System.out.println("Calling for a connection packet to be sent");
 				packetCreator.sendConnectionPacket(-1, "");
 			}
+			if (((PacketCreatorForServer) packetCreator).doneSending()) {
+				isTerminated = true;
+				((PacketCreatorForServer) packetCreator).sendDisconnectPackets();
+				
+			}
 		}
 		System.exit(0);
 	}

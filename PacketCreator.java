@@ -149,13 +149,16 @@ public class PacketCreator {
 		private boolean haveConnectionACK() throws IOException {
 			boolean haveConnection = true;
 			DatagramPacket resentPacket = null;
-			int seqNumber = timeoutPackets.get(0);
-			System.out.println("TimeoutPacket Seq Num: " + seqNumber);
 			
-			if (storageContainsPacket(seqNumber)) {
-				haveConnection = false;
-				resentPacket = getPacketFromStorage(seqNumber);
-				packetSender.sendPacket(resentPacket);
+			if (!timeoutPackets.isEmpty()) {
+				int seqNumber = timeoutPackets.get(0);
+				System.out.println("TimeoutPacket Seq Num: " + seqNumber);
+				
+				if (storageContainsPacket(seqNumber)) {
+					haveConnection = false;
+					resentPacket = getPacketFromStorage(seqNumber);
+					packetSender.sendPacket(resentPacket);
+				}
 			}
 			
 			return haveConnection;
