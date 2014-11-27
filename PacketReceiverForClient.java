@@ -55,15 +55,15 @@ public class PacketReceiverForClient extends PacketReceiver {
 				((PacketCreatorForClient) packetCreator).sendACK(seqNumber);
 				
 				// Can either be a data ACK or finalizing Connection
-				if (packet.isData()) {
+				 if (packet.isConnection()) {
+						System.out.println("Removing Packet from storage: " + INITIAL_ACK);
+						packetCreator.removePacketFromStorage(INITIAL_ACK);
+						packetCreator.clearTimeoutPacket();
+						
+				 }else if (packet.isData()) {
 					// Store file data to be parsed after receiving entire file
 					dataStore.put(seqNumber, packet.getData());
 					System.out.println("RECEIVING DATA - SEQ NUMBER: " + seqNumber);
-
-				} else if (packet.isConnection()) {
-					System.out.println("Removing Packet from storage: " + INITIAL_ACK);
-					packetCreator.removePacketFromStorage(INITIAL_ACK);
-					packetCreator.clearTimeoutPacket();
 					
 				} else if (packet.isDisconnection()) {
 					isDisconnected = true;
