@@ -33,9 +33,13 @@ public class Packet {
 		}
 		header = new RTP_Header(headerAsBytes);
 		
-		//TODO: funnel all the other bytes, if any, into file reconstruction.
-		// split the new Int buffer into header (frst 6 ints) 
-		// and data(all the rest)
+		if (byteArray.length > headerAsBytes.length) {
+			rtp_data = new byte[(byteArray.length - headerAsBytes.length)];
+			
+			for(int i = headerAsBytes.length; i < byteArray.length; i++) {
+				this.rtp_data[i - headerAsBytes.length] = byteArray[i];
+			}
+		}
 	}
 	
 	protected void makeRTPPacket() {
