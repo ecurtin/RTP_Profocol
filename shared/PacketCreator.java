@@ -28,8 +28,9 @@ public class PacketCreator {
 	protected byte[] fileData = new byte[maxDataSizePerPacketInBytes];
 	protected final int INITIAL_ACK = -1;
 	protected int currentSeqNumber = 0;
-	protected final int TIMEOUT_SIZE = 250; // ms
-
+	protected final int TIMEOUT_SIZE = 500; // ms
+	protected double fileSize;
+	
 	protected InetAddress destinationAddress;
 	protected InetAddress sourceAddress;
 	protected int windowSize;
@@ -70,7 +71,6 @@ public class PacketCreator {
 		connectionPacket.setSeqNumber(INITIAL_ACK);
 		//connectionPacket.setChecksum(connectionPacket.computeChecksum());
 		
-		System.out.println("WINDOW SIZE: " + windowSize);
 		if (windowSize > 0) {
 			connectionPacket.setWindowSize(windowSize);
 			connectionPacket.setFileName(fileName);
@@ -111,7 +111,7 @@ public class PacketCreator {
 
 	public void setFileName(String fileName) throws FileNotFoundException {
 		File file = new File(fileName.trim());
-		System.out.println("Confirmed file: " + file.getAbsolutePath());
+		fileSize = file.length();
 		fileStream = new FileInputStream(file);
 	}
 	
@@ -125,6 +125,10 @@ public class PacketCreator {
 	
 	public boolean isConnected() {
 		return isConnected;
+	}
+	
+	public double getFileSize() {
+		return fileSize;
 	}
 	
 	/**
@@ -146,7 +150,6 @@ public class PacketCreator {
 			if (!isConnected) {
 				timeoutPackets.clear();
 			}
-			System.out.println("CONNECTION THREAD ENDED");
 		}
 		
 		// Determines if we received the connection ACK
@@ -163,7 +166,6 @@ public class PacketCreator {
 					packetSender.sendPacket(resentPacket);
 				}
 			}
-			
 			return haveConnection;
 		}
 	}

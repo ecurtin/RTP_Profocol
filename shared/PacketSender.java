@@ -13,7 +13,6 @@ public class PacketSender {
 	}
 	
 	public void sendPacket(DatagramPacket packetToBeSent) throws IOException {
-		System.out.println("sending packet");
 		socket.send(packetToBeSent);
 	}
 	

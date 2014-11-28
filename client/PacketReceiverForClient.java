@@ -36,7 +36,6 @@ public class PacketReceiverForClient extends PacketReceiver {
 		this.packetCreator.setDestinationAddress(destinationAddress);
 		this.packetCreator.setDestinationPort(destinationPort);
 		
-		System.out.println("sending packet");
 		packetCreator.sendConnectionPacket(windowSize, fileLocation);
 		
 		while(!isDisconnected) {
@@ -48,42 +47,29 @@ public class PacketReceiverForClient extends PacketReceiver {
 			
 			// Translate datagram packet into something RTP understands
 			Packet packet = new Packet(receivePacket);
-			//packet.makeRTPPacket();
-			System.out.println();
-			System.out.println("---------------------------------");
-			// Error Check
-			System.out.println("Received Valid packet: "+ packet.validateChecksum());
-			System.out.println("Received Connection packet: " + packet.isConnection());
-			System.out.println("Received Data packet: " + packet.isData());
 			if (packet.validateChecksum()) {
 				
 				// Send acknowledgment of packets retrieval
 				int seqNumber = packet.getSeqNumber();
-				System.out.println("Sending ACK..." + seqNumber);
 				((PacketCreatorForClient) packetCreator).sendACK(seqNumber);
 				
 				// Can either be a data ACK or finalizing Connection
 				 if (packet.isConnection()) {
-						System.out.println("Removing Packet from storage: " + INITIAL_ACK);
 						packetCreator.removePacketFromStorage(INITIAL_ACK);
 						packetCreator.clearTimeoutPacket();
 						
 				 }else if (packet.isData()) {
 					// Store file data to be parsed after receiving entire file
-					System.out.println("Packet data size: " + packet.getData().length);
 					dataStore.put(seqNumber, packet.getData());
-					System.out.println("RECEIVING DATA - SEQ NUMBER: " + seqNumber);
 					
 				} else if (packet.isDisconnection()) {
 					isDisconnected = true;
-					System.out.println("DISCONNECTING");
 				}
 			}
 		}
 		// Put all the data pieces into a file
 		int lengthOfDataStore = dataStore.size();
 		for (int i = 0; i < lengthOfDataStore; i++) {
-			System.out.println("size of written packet data: " + dataStore.get(i).length);
 			fileStream.write(dataStore.get(i));
 		}
 		fileStream.close();

@@ -7,6 +7,7 @@ import java.net.InetAddress;
 
 public class fta_client {
 	private static PacketReceiverForClient receiver;
+	private static boolean isTerminated = false;
 	
 	public static void main(String[] args) throws IOException {
 		// Must be even number port
@@ -29,16 +30,20 @@ public class fta_client {
 		
 		int windowSize = 0;
 		
-		while (true) {
+		while (!isTerminated) {
 			BufferedReader buffer = new BufferedReader(new InputStreamReader(System.in));
 			System.out.println("Enter command: ");
 			
 			String command = buffer.readLine();
+
+			if (command.contains("exit")) {
+				System.exit(0);
+			}
 			
-			if (command.substring(0, 6).equals("window")) {
+			if (command.contains("window")) {
 				windowSize = Integer.parseInt(command.substring(7));
 				
-			} else if (command.substring(0, 11).equals("connect-get")) {
+			} else if (command.contains("connect-get")) {
 				String fileName = command.substring(12);
 				if (windowSize < 1) {
 					System.out.println("Please enter a valid window size.");

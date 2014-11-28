@@ -3,7 +3,6 @@ package shared;
 public class ConnectionPacket extends Packet {
 
 	public ConnectionPacket() {
-		System.out.println("connection packet being created");
 		header = new RTP_Header();
 		header.setSyncOn();
 		header.setConnectionFlag(true);

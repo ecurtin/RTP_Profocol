@@ -22,7 +22,6 @@ class PacketCreatorForClient extends PacketCreator {
 	public void sendACK(int ackNumber) throws IOException {
 		DatagramPacket packetToBeSent = createACKPacket(ackNumber);
 		packetSender.sendPacket(packetToBeSent);
-		System.out.println("Sent ACK Packet");
 	}
 	
 	public DatagramPacket createACKPacket(int ackNumber) {
