@@ -13,13 +13,14 @@ public class RTP_Header {
 	private int port_numbers = 3;
 	private int ack_number = 4;
 	private int sync_flags_window = 5;
+	private int data_size = 6;
 	private int checksum = 0;
 
 	public int[] header;
 	
 	public RTP_Header() {
-		header = new int[6];
-		for(int i = 0; i < 6; i++){
+		header = new int[7];
+		for(int i = 0; i < 7; i++){
 			header[i] = 0;
 		}
 	}
@@ -42,8 +43,8 @@ public class RTP_Header {
 //	}
 	
 	public RTP_Header(byte[] byteArray) {
-		header = new int[6];
-		for(int i = 0; i < 6; i++){
+		header = new int[7];
+		for(int i = 0; i < 7; i++){
 			header[i] = 0;
 		}
 		
@@ -280,6 +281,14 @@ public class RTP_Header {
 
 	public int[] getHeader() {
 		return header;
+	}
+	
+	public void setDataSize(int value) {
+		header[data_size] = value;
+	}
+	
+	public int getDataSize() {
+		return header[data_size];		
 	}
 
 

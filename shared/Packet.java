@@ -35,18 +35,23 @@ public class Packet {
 		header = new RTP_Header(headerAsBytes);
 		
 		if (byteArray.length > headerAsBytes.length) {
-			rtp_data = new byte[(byteArray.length - headerAsBytes.length)];
+			rtp_data = new byte[getDataSize()];
 			
-			for(int i = headerAsBytes.length; i < byteArray.length; i++) {
+			for(int i = headerAsBytes.length; i < (headerAsBytes.length + rtp_data.length); i++) {
 				this.rtp_data[i - headerAsBytes.length] = byteArray[i];
 			}
 		}
 	}
 	
-	protected void makeRTPPacket() {
-		byte[] headerInBytes = header.asByteArray();
-		//pack with header and data
-		if(rtp_data != null) {
+	public void makeRTPPacket() {
+		if( this.rtp_data == null ) {
+			setDataSize(0);
+			rtp_packet = header.asByteArray();
+		}
+		else {
+			setDataSize(rtp_data.length);
+			byte[] headerInBytes = header.asByteArray();
+
 			rtp_packet = new byte[headerInBytes.length + this.rtp_data.length];
 			
 			for(int i = 0; i < headerInBytes.length; i++) {
@@ -57,17 +62,11 @@ public class Packet {
 				rtp_packet[i + headerInBytes.length] = rtp_data[i];
 			}
 		}
-		
-		//pack with just header
-		else {
-			rtp_packet = headerInBytes;
-		}
-
 	}
 
 	public DatagramPacket packInUDP() {
-		makeRTPPacket();
 		setChecksum(computeChecksum());
+		makeRTPPacket();
 		return new DatagramPacket(this.rtp_packet,
 									0,
 									rtp_packet.length, 
@@ -89,6 +88,14 @@ public class Packet {
 	//
 	public byte[] getData() {
 		return rtp_data;
+	}
+	
+	public int getDataSize() {
+		return header.getDataSize();
+	}
+	
+	public void setDataSize(int value) {
+		header.setDataSize(value);
 	}
 	
 	public int getACK() {
@@ -181,23 +188,29 @@ public class Packet {
 	}
 	
 	public int computeChecksum() {
-//		checksumValidator.reset();
-//		if(rtp_packet != null) {
-//			checksumValidator.update(rtp_packet, 4, (rtp_packet.length - 4));
-//		}
-//		
-//		//checksum returns a long, mod by int max value to make it fit into an int
-//		//this isn't part of the algorithm, but it is repeatable and should not effect
-//		//validation
-//		int checksumAsInt = (int) checksumValidator.getValue() % Integer.MAX_VALUE;
-//		
-//		return checksumAsInt;
+		makeRTPPacket();
+		checksumValidator.reset();
+		if(rtp_packet != null) {
+			checksumValidator.update(rtp_packet, 4, (rtp_packet.length - 4));
+		}
 		
-		return 0;
+		//checksum returns a long, mod by int max value to make it fit into an int
+		//this isn't part of the algorithm, but it is repeatable and should not effect
+		//validation
+		int checksumAsInt = (int) checksumValidator.getValue() % Integer.MAX_VALUE;
+		
+		return checksumAsInt;
+		
+		//return 0;
 	}
 	
 	public void setChecksum(int value) {
 		header.setChecksum(value);
+		makeRTPPacket();
+	}
+	
+	public int getChecksum() {
+		return header.getChecksum();
 	}
 
 	public boolean validateChecksum() {
@@ -212,17 +225,17 @@ public class Packet {
 		}
 		return false;*/
 		
-//		makeRTPPacket();
-//		int computedChecksum = computeChecksum();
-//		
-//		if(computedChecksum != header.getChecksum()) {
-//			return false;
-//		}
-//		else {
-//			return true;
-//		}
+		makeRTPPacket();
+		int computedChecksum = computeChecksum();
 		
-		return true;
+		if(computedChecksum != header.getChecksum()) {
+			return false;
+		}
+		else {
+			return true;
+		}
+		
+		//return true;
 	}
 	
 	public void setFileName(String filename) {

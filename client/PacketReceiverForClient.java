@@ -43,7 +43,7 @@ public class PacketReceiverForClient extends PacketReceiver {
 			
 			// Translate datagram packet into something RTP understands
 			Packet packet = new Packet(receivePacket);
-			packet.makeRTPPacket();
+			//packet.makeRTPPacket();
 			System.out.println();
 			System.out.println("---------------------------------");
 			// Error Check

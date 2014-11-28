@@ -1,6 +1,8 @@
 
 import static org.junit.Assert.*;
 
+import java.net.DatagramPacket;
+
 import org.junit.Test;
 
 import shared.ACKPacket;
@@ -49,6 +51,40 @@ public class PacketTest {
 		assertNotEquals(pack1.computeChecksum(), pack2.computeChecksum());
 		assertTrue(pack1.validateChecksum());
 		assertNotEquals(pack1.computeChecksum(), pack3.computeChecksum());
+	}
+	
+	@Test
+	public void testChecksumValidation2() {
+		Packet pack1 = new Packet();
+		pack1.setDestinationPort(359);
+		pack1.header.setDataFlag(true);
+		pack1.setData(new String("this is a string").getBytes());
+		
+		pack1.makeRTPPacket();
+		//int checksumBeforeSend = pack1.computeChecksum();
+		//pack1.setChecksum(checksumBeforeSend);
+		//pack1.makeRTPPacket();
+		
+		DatagramPacket dgram = pack1.packInUDP();
+		
+		Packet pack2 = new Packet(dgram);
+		
+		int checksumAfterSend = pack2.getChecksum();
+		
+		pack2.makeRTPPacket();
+		
+		int computedChecksumAfterSend = pack2.computeChecksum();
+		
+		//System.out.println("ChecksumBeforeSend = "+checksumBeforeSend);
+		System.out.println("ChecksumAfter Send = "+checksumAfterSend);
+		System.out.println("ChecksumCalculated = "+computedChecksumAfterSend);
+		
+		//assertEquals(checksumBeforeSend, checksumAfterSend);
+		
+		
+		
+		
+		
 	}
 
 }
