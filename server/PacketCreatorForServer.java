@@ -42,6 +42,7 @@ public class PacketCreatorForServer extends PacketCreator {
 		// Check for packet that we received ACK for
 		if (storageContainsPacket(ackNumber)) {
 			removePacketFromStorage(ackNumber);
+			System.out.println("RECEIVED ACK for:" + ackNumber);
 			System.out.println("Removing packet " + ackNumber + " from storage.");
 			// Begin sending file if ACK was for connection
 			if (!isConnected) {
@@ -80,10 +81,21 @@ public class PacketCreatorForServer extends PacketCreator {
 		int numberOfPacketsCreated = 0;
 		System.out.println("Window size:" + windowSize);
 		System.out.println("More data: " + moreFileDataToPacketize(fileStream));
-		while (moreFileDataToPacketize(fileStream) && numberOfPacketsCreated != windowSize) {
+		while (numberOfPacketsCreated != windowSize && moreFileDataToPacketize(fileStream)) {
 			// Store as much data from the file as you can into fileData
-			fileStream.read(fileData);
-			DataPacket dataPacket = new DataPacket(fileData);
+			DataPacket dataPacket;
+			
+			if (fileStream.available() < fileData.length) {
+				byte[] lastPartOfFile = new byte[fileStream.available()];
+				fileStream.read(lastPartOfFile, 0, lastPartOfFile.length);
+				dataPacket = new DataPacket(lastPartOfFile);
+				System.out.println("sending packet with data size of: " + lastPartOfFile.length);
+			} else {
+				fileStream.read(fileData, 0, fileData.length);
+				dataPacket = new DataPacket(fileData);
+			}
+			
+			System.out.println("Sending packet with data size of: " + dataPacket.getData().length);
 			
 			// Set all of the header values
 			dataPacket.setSeqNumber(currentSeqNumber);
@@ -106,6 +118,7 @@ public class PacketCreatorForServer extends PacketCreator {
 		}
 		if (!moreFileDataToPacketize(fileStream)) {
 			moreDataPackets = false;
+			fileStream.close();
 		}
 		return packetsQueue;
 	}
@@ -135,7 +148,7 @@ public class PacketCreatorForServer extends PacketCreator {
 		catch(IOException e) {
 			e.printStackTrace();
 		}
-		timeout.schedule(new DisconnectTask(), TIMEOUT_SIZE);
+		timeout.schedule(new DisconnectTask(), TIMEOUT_SIZE*2);
 	}
 	
 	/**

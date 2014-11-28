@@ -46,12 +46,12 @@ public class PacketReceiverForServer extends PacketReceiver {
 			System.out.println("received packet");
 			System.out.println("Is ack: " + packet.isACK());
 			System.out.println("Is connection: " + packet.isConnection());
-			System.out.println("SEQ/ACK Number: " + packet.getACK());
+
 			// Can either be a data ACK or finalizing Connection
 			if (packet.isACK()) {
 				int ACKNumber = packet.getACK();
 				((PacketCreatorForServer) packetCreator).receiveACK(ACKNumber);
-				System.out.println("ACKNumber: " + ACKNumber);
+				
 			// Connection Packet (receive file name to transfer)
 			} else if (packet.isConnection()) {
 				String fileName = packet.getFileName();
@@ -60,6 +60,7 @@ public class PacketReceiverForServer extends PacketReceiver {
 				setWindowSize(packet.getWindowSize());
 				System.out.println("Calling for a connection packet to be sent");
 				packetCreator.sendConnectionPacket(-1, "");
+				
 			}
 			if (((PacketCreatorForServer) packetCreator).doneSending()) {
 				isTerminated = true;

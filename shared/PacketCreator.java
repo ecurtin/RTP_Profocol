@@ -111,6 +111,7 @@ public class PacketCreator {
 
 	public void setFileName(String fileName) throws FileNotFoundException {
 		File file = new File(fileName.trim());
+		System.out.println("Confirmed file: " + file.getAbsolutePath());
 		fileStream = new FileInputStream(file);
 	}
 	
