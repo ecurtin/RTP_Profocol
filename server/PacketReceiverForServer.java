@@ -41,9 +41,11 @@ public class PacketReceiverForServer extends PacketReceiver {
 			
 			// Translate datagram packet into something RTP understands
 			Packet packet = new Packet(receivePacket);
+			//packet.makeRTPPacket();
 			System.out.println("");
 			System.out.println("-------------------------------------");
 			System.out.println("received packet");
+			System.out.println("Is valid: "+packet.validateChecksum());
 			System.out.println("Is ack: " + packet.isACK());
 			System.out.println("Is connection: " + packet.isConnection());
 

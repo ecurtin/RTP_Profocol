@@ -8,18 +8,19 @@ import java.nio.IntBuffer;
  */
 public class RTP_Header {
 
-	private int source_ip;
-	private int dest_ip;
-	private int port_numbers;
-	private int ack_number;
-	private int sync_flags_window;
-	private int checksum;
+	private int source_ip = 1;
+	private int dest_ip = 2;
+	private int port_numbers = 3;
+	private int ack_number = 4;
+	private int sync_flags_window = 5;
+	private int data_size = 6;
+	private int checksum = 0;
 
 	public int[] header;
 	
 	public RTP_Header() {
-		header = new int[6];
-		for(int i = 0; i < 6; i++){
+		header = new int[7];
+		for(int i = 0; i < 7; i++){
 			header[i] = 0;
 		}
 	}
@@ -42,8 +43,8 @@ public class RTP_Header {
 //	}
 	
 	public RTP_Header(byte[] byteArray) {
-		header = new int[6];
-		for(int i = 0; i < 6; i++){
+		header = new int[7];
+		for(int i = 0; i < 7; i++){
 			header[i] = 0;
 		}
 		
@@ -81,7 +82,7 @@ public class RTP_Header {
 			dest = dest << 16;
 			//System.out.println("dest shifted: "+dest);
 			//System.out.println("header[2]: "+header[2]);
-			header[2] = (dest | header[2]);
+			header[port_numbers] = (dest | header[port_numbers]);
 			//System.out.println("header[2]: "+header[2]);
 			return true;
 		}
@@ -92,7 +93,7 @@ public class RTP_Header {
 			return false; //will not fit into a 16 bit slot;
 		}
 		else {
-			header[2] = ( header[2] | source);
+			header[port_numbers] = ( header[port_numbers] | source);
 			return true;
 		}
 	}
@@ -130,12 +131,12 @@ public class RTP_Header {
 //	}
 	
 	public void setSyncOn() {
-		header[4] = set(header[4], 0);
+		header[sync_flags_window] = set(header[sync_flags_window], 0);
 		
 	}
 	
 	public void setSyncOff() {
-		header[4] = clear(header[4], 0);
+		header[sync_flags_window] = clear(header[sync_flags_window], 0);
 	}
 	
 	
@@ -144,10 +145,10 @@ public class RTP_Header {
 	 */
 	public void setDataFlag(boolean bool) {
 		if(bool == true) {
-			header[4] = set(header[4], 1);
+			header[sync_flags_window] = set(header[sync_flags_window], 1);
 		}
 		else {
-			header[4] = clear(header[4], 1);
+			header[sync_flags_window] = clear(header[sync_flags_window], 1);
 		}
 	}
 	
@@ -157,18 +158,18 @@ public class RTP_Header {
 	 */
 	public void setAckFlag(boolean bool) {
 		if(bool == true) {
-			header[4] = clear(header[4], 1);
+			header[sync_flags_window] = clear(header[sync_flags_window], 1);
 			//System.out.println("clearing bit 1 of header[4]");
 		}
 		else {
-			header[4] = set(header[4], 1);
+			header[sync_flags_window] = set(header[sync_flags_window], 1);
 			//System.out.println("setting bit 1 of header[4]");
 		}
 	}
 
 	public boolean isACK() {
 		//System.out.println("checking isSet(), it is :");
-		if(isSet(header[4], 1)){
+		if(isSet(header[sync_flags_window], 1)){
 			//System.out.println("true, therefore this is a data packet");
 			return false;
 		}
@@ -182,15 +183,15 @@ public class RTP_Header {
 	
 	public void setConnectionFlag(boolean bool) {
 		if(bool == true) {
-			header[4] = set(header[4], 2);
+			header[sync_flags_window] = set(header[sync_flags_window], 2);
 		}
 		else {
-			header[4] = clear(header[4], 2);
+			header[sync_flags_window] = clear(header[sync_flags_window], 2);
 		}
 	}
 	
 	public boolean isConnection() {
-		return isSet(header[4], 2);
+		return isSet(header[sync_flags_window], 2);
 	}
 	
 	
@@ -199,36 +200,40 @@ public class RTP_Header {
 			return false; //will not fit
 		}
 		window_size = window_size << 3;
-		header[4] = header[4] & (0x00000007);
-		header[4] = header[4] | window_size;
+		header[sync_flags_window] = header[sync_flags_window] & (0x00000007);
+		header[sync_flags_window] = header[sync_flags_window] | window_size;
 		return true;
 	}
 	
 	
 	public void setSequenceNumber(int seqnum){
-		header[3] = seqnum;
+		header[ack_number] = seqnum;
 	}
 	
 	public void setSourceIP(int source){
-		header[0] = source;
+		header[source_ip] = source;
 	}
 	
 	public void setDestIP(int dest) {
-		header[1] = dest;
+		header[dest_ip] = dest;
+	}
+	
+	public void setChecksum(int value) {
+		header[checksum] = value;
 	}
 
 	/*---------------------GETTERS---------------------------*/
 
 	public int getSourceIP() {
-		return header[0];
+		return header[source_ip];
 	}
 
 	public int getDestIP() {
-		return header[1];
+		return header[dest_ip];
 	}
 
 	public int getSourcePort() {
-		int source_p = header[2];
+		int source_p = header[port_numbers];
 		//System.out.println("getting");
 		//System.out.println("header[2]: "+header[2]);
 		source_p = source_p & 0x0000FFFF;
@@ -238,7 +243,7 @@ public class RTP_Header {
 	}
 
 	public int getDestPort() {
-		int dest_p = header[2];
+		int dest_p = header[port_numbers];
 		//System.out.println("getting");
 		//System.out.println("header[2]: "+header[2]);
 		dest_p = (dest_p & 0xFFFF0000) >> 16;
@@ -249,33 +254,41 @@ public class RTP_Header {
 
 	//ack number is same as packet number
 	public int getPacketNumber() {
-		return header[3];
+		return header[ack_number];
 	}
 
 	public int getWindowSize() {
-		int window = header[4];
+		int window = header[sync_flags_window];
 		window = window ^ 0x7;
 		return (window >> 3);
 	}
 
 	public boolean isData() {
-		return isSet(header[4], 1);
+		return isSet(header[sync_flags_window], 1);
 	}
 
 
 
 	public boolean isSync() {
-		return isSet(header[4], 0);
+		return isSet(header[sync_flags_window], 0);
 	}
 
 
 
 	public int getChecksum() {
-		return header[5];
+		return header[checksum];
 	}
 
 	public int[] getHeader() {
 		return header;
+	}
+	
+	public void setDataSize(int value) {
+		header[data_size] = value;
+	}
+	
+	public int getDataSize() {
+		return header[data_size];		
 	}
 
 

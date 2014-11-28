@@ -69,6 +69,7 @@ public class PacketCreator {
 		connectionPacket.setDestinationIPAddress(destinationAddress);
 		connectionPacket.setDestinationPort(destinationPort);
 		connectionPacket.setSeqNumber(INITIAL_ACK);
+		//connectionPacket.setChecksum(connectionPacket.computeChecksum());
 		
 		System.out.println("WINDOW SIZE: " + windowSize);
 		if (windowSize > 0) {
