@@ -56,7 +56,6 @@ public class PacketCreator {
 	 */
 	public void sendConnectionPacket(int windowSize, String fileName) throws IOException {
 		DatagramPacket sendingPacket = createConnectPacket(windowSize, fileName);
-		sentPacketStore.put(INITIAL_ACK, sendingPacket);
 		packetSender.sendPacket(sendingPacket);
 		timeout.schedule(new ConnectTask(), TIMEOUT_SIZE);
 	}
@@ -144,8 +143,10 @@ public class PacketCreator {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			timeoutPackets.clear();
-			System.out.println("TIMEOUT THREAD ENDED");
+			if (!isConnected) {
+				timeoutPackets.clear();
+			}
+			System.out.println("CONNECTION THREAD ENDED");
 		}
 		
 		// Determines if we received the connection ACK
@@ -155,7 +156,6 @@ public class PacketCreator {
 			
 			if (!timeoutPackets.isEmpty()) {
 				int seqNumber = timeoutPackets.get(0);
-				System.out.println("TimeoutPacket Seq Num: " + seqNumber);
 				
 				if (storageContainsPacket(seqNumber)) {
 					haveConnection = false;

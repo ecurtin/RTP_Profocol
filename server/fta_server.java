@@ -8,7 +8,7 @@ import java.net.InetAddress;
 public class fta_server {
 	private static PacketReceiverForServer receiver;
 	private static boolean isTerminated = false;
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, InterruptedException {
 		// Has to be odd
 		if (args.length < 3) {
 			System.out.println("Please enter the required parameters.");

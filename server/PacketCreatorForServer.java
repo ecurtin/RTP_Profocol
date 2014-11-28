@@ -14,6 +14,7 @@ import java.util.Queue;
 import java.util.TimerTask;
 //import java.util.concurrent.ConcurrentHashMap;
 
+
 import shared.DataPacket;
 import shared.DisconnectionPacket;
 import shared.Packet;
@@ -26,6 +27,7 @@ import shared.PacketCreator;
  */
 public class PacketCreatorForServer extends PacketCreator {
 	private boolean moreDataPackets = true;
+	private boolean disconnected = false;
 	
 	
 	public PacketCreatorForServer(DatagramSocket socket, int sourcePort, InetAddress sourceAddress) throws SocketException {
@@ -46,6 +48,7 @@ public class PacketCreatorForServer extends PacketCreator {
 			System.out.println("Removing packet " + ackNumber + " from storage.");
 			// Begin sending file if ACK was for connection
 			if (!isConnected) {
+				timeoutPackets.clear();
 				System.out.println("~~~~~~~~~~~~~~~~~~~~~");
 				System.out.println("We are now connected.");
 				System.out.println("~~~~~~~~~~~~~~~~~~~~~");
@@ -89,7 +92,6 @@ public class PacketCreatorForServer extends PacketCreator {
 				byte[] lastPartOfFile = new byte[fileStream.available()];
 				fileStream.read(lastPartOfFile, 0, lastPartOfFile.length);
 				dataPacket = new DataPacket(lastPartOfFile);
-				System.out.println("sending packet with data size of: " + lastPartOfFile.length);
 			} else {
 				fileStream.read(fileData, 0, fileData.length);
 				dataPacket = new DataPacket(fileData);
@@ -109,7 +111,6 @@ public class PacketCreatorForServer extends PacketCreator {
 			timeoutPackets.add(currentSeqNumber);
 			sentPacketStore.put(currentSeqNumber, sendPacket);
 			System.out.println();
-			System.out.println("Sequence Number: " + currentSeqNumber);
 			System.out.println("TimeoutPackets:");
 			System.out.println(timeoutPackets.toString());
 			numberOfPacketsCreated++;
@@ -128,7 +129,7 @@ public class PacketCreatorForServer extends PacketCreator {
 	}
 	
 	
-	public void sendDisconnectPackets() throws IOException {
+	public void sendDisconnectPackets() throws IOException, InterruptedException {
 		Packet disconnectPacket = new DisconnectionPacket();
 		
 		// Add appropriate values to disconnect packet header
@@ -163,10 +164,10 @@ public class PacketCreatorForServer extends PacketCreator {
 					Thread.sleep(TIMEOUT_SIZE);
 				}
 				// If all are ACK'd send next window size of data packets
-				timeoutPackets.clear();
 				if (moreDataPackets) {
 					sendWindowOfPackets();
 				} else {
+					System.out.println("SENDING DISCONNECT FROM TIMEOUT");
 					sendDisconnectPackets();
 				}
 			} catch (Exception e) {
@@ -178,30 +179,42 @@ public class PacketCreatorForServer extends PacketCreator {
 		private boolean allACK() throws IOException {
 			boolean isDone = true;
 			int numberOfTimeoutPackets = timeoutPackets.size();
-			DatagramPacket[] resentPackets = new DatagramPacket[numberOfTimeoutPackets];
-			int missingPacketCounter = 0;
+			Queue<DatagramPacket> resentPacketsQueue = new LinkedList<DatagramPacket>();
+
+			System.out.println();
+			System.out.println("Checking acks in timeout...");
+			System.out.println("Number of Timeout packets: " + numberOfTimeoutPackets);
 			
 			for (int i = 0; i < numberOfTimeoutPackets; i++) {
 				// Get the packet sequence numbers sent
 				int seqNumber = timeoutPackets.get(i);
 				
+				System.out.println("Checking seq number: " + seqNumber);
+				
 				// Packet has not been ack'd
 				if (storageContainsPacket(seqNumber)) {
-					resentPackets[missingPacketCounter] = getPacketFromStorage(seqNumber);
-					missingPacketCounter++;
+					resentPacketsQueue.add(getPacketFromStorage(seqNumber));
+					System.out.println("Resending Packet: " + seqNumber);
 					isDone = false;
 				}
 			}
 			// Re-send all non-ack'd packets
 			if (!isDone) {
+				int numberOfPacketsToBeResent = resentPacketsQueue.size();
+				DatagramPacket[] resentPackets = new DatagramPacket[numberOfPacketsToBeResent];
+				for (int i = 0; i < numberOfPacketsToBeResent; i++) {
+					resentPackets[i] = resentPacketsQueue.remove();
+				}
 				packetSender.sendPackets(resentPackets);
+			} else {
+				timeoutPackets.clear();
 			}
 			return isDone;
 		}
 	}
 	
-	public boolean doneSending() {
-		return !moreDataPackets;
+	public boolean receivedDisconnectACK() {
+		return disconnected;
 	}
 	
 	/**
@@ -221,6 +234,7 @@ public class PacketCreatorForServer extends PacketCreator {
 				e.printStackTrace();
 			}
 			timeoutPackets.clear();
+			disconnected = true;			
 		}
 		
 		// Determines if we received the disconnect ACK

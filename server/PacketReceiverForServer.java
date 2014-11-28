@@ -8,6 +8,7 @@ import java.net.InetAddress;
 //import java.net.SocketException;
 //import java.util.Queue;
 
+
 import shared.Packet;
 import shared.PacketReceiver;
 
@@ -23,7 +24,7 @@ public class PacketReceiverForServer extends PacketReceiver {
 	private boolean isTerminated = false;
 	
 	public PacketReceiverForServer(int sourcePort, InetAddress destinationAddress, 
-			int destinationPort) throws IOException {
+			int destinationPort) throws IOException, InterruptedException {
 		// SETUP SERVER
 		DatagramSocket socket = new DatagramSocket(sourcePort);
 		InetAddress sourceAddress = InetAddress.getLocalHost();
@@ -64,10 +65,8 @@ public class PacketReceiverForServer extends PacketReceiver {
 				packetCreator.sendConnectionPacket(-1, "");
 				
 			}
-			if (((PacketCreatorForServer) packetCreator).doneSending()) {
-				isTerminated = true;
-				((PacketCreatorForServer) packetCreator).sendDisconnectPackets();
-				
+			if (((PacketCreatorForServer) packetCreator).receivedDisconnectACK()) {
+				isTerminated = true;				
 			}
 		}
 		System.exit(0);
